@@ -8,6 +8,7 @@ import { LawyerCard } from "@/components/cards/LawyerCard";
 import { TestimonialCard } from "@/components/cards/TestimonialCard";
 import { PostCard } from "@/components/cards/PostCard";
 import { MotionReveal } from "@/components/interactive/MotionReveal";
+import { Parallax } from "@/components/interactive/Parallax";
 import {
   getAreas,
   getLawyers,
@@ -34,27 +35,31 @@ export default function Home() {
       {/* HERO — cinematográfico ("Presença") */}
       <section className="relative isolate flex min-h-[88vh] items-center overflow-hidden bg-green-900 text-white">
         {/* Imagem tratada de fundo */}
-        <div aria-hidden="true" className="absolute inset-0">
-          <Image
-            src="/img/equipe.jpg"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="cine-image object-cover object-center"
-          />
+        <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
+          <Parallax speed={0.12} className="absolute -top-[12%] left-0 h-[124%] w-full">
+            <Image
+              src="/img/equipe.jpg"
+              alt=""
+              fill
+              priority
+              sizes="100vw"
+              className="cine-image object-cover object-center"
+            />
+          </Parallax>
           <div className="absolute inset-0 bg-gradient-to-r from-green-900 via-green-900/92 to-green-900/55" />
           <div className="absolute inset-0 bg-gradient-to-t from-green-900 via-green-900/40 to-green-900/15" />
           <div className="grain-overlay pointer-events-none absolute inset-0" />
         </div>
 
-        {/* § como luz */}
-        <span
-          aria-hidden="true"
-          className="cine-glow pointer-events-none absolute right-[-10vw] top-1/2 -translate-y-1/2 select-none font-serif text-[34rem] leading-none text-gold-500/[0.12] blur-[1px] sm:text-[48rem]"
-        >
-          §
-        </span>
+        {/* § como luz (com parallax) */}
+        <Parallax speed={0.22} className="pointer-events-none absolute inset-0">
+          <span
+            aria-hidden="true"
+            className="cine-glow absolute right-[-10vw] top-1/2 -translate-y-1/2 select-none font-serif text-[34rem] leading-none text-gold-500/[0.12] blur-[1px] sm:text-[48rem]"
+          >
+            §
+          </span>
+        </Parallax>
 
         <Container className="relative py-28 lg:py-36">
           <div className="max-w-3xl">
@@ -132,12 +137,14 @@ export default function Home() {
           aria-hidden="true"
           className="grain-overlay pointer-events-none absolute inset-0"
         />
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-serif text-[24rem] leading-none text-gold-500/[0.07] blur-[1px] sm:text-[34rem]"
-        >
-          §
-        </span>
+        <Parallax speed={0.16} className="pointer-events-none absolute inset-0">
+          <span
+            aria-hidden="true"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-serif text-[24rem] leading-none text-gold-500/[0.07] blur-[1px] sm:text-[34rem]"
+          >
+            §
+          </span>
+        </Parallax>
         <Container className="relative py-24 lg:py-32">
           <MotionReveal>
             <p className="mx-auto max-w-4xl text-balance text-center font-serif text-[clamp(1.75rem,1.1rem+2.6vw,3rem)] font-medium italic leading-[1.3] text-white">

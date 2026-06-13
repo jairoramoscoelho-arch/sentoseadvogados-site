@@ -6,6 +6,7 @@ import { site } from "@/content/site";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
+import { ScrollProgress } from "@/components/interactive/ScrollProgress";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organizationLd, webSiteLd } from "@/lib/jsonld";
 
@@ -86,6 +87,7 @@ export default function RootLayout({
         </a>
         <JsonLd data={organizationLd()} />
         <JsonLd data={webSiteLd()} />
+        <ScrollProgress />
         <Header />
         <main id="main" className="flex-1">
           {children}
