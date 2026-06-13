@@ -3,7 +3,6 @@ import { Check, ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { Stars } from "@/components/ui/Stars";
 import { PracticeAreaCard } from "@/components/cards/PracticeAreaCard";
 import { LawyerCard } from "@/components/cards/LawyerCard";
 import { TestimonialCard } from "@/components/cards/TestimonialCard";
@@ -38,17 +37,37 @@ export default function Home() {
 
   return (
     <>
-      {/* HERO */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-green-900 via-green-900 to-green-800 text-white">
+      {/* HERO — cinematográfico ("Presença") */}
+      <section className="relative isolate flex min-h-[88vh] items-center overflow-hidden bg-green-900 text-white">
+        {/* Imagem tratada de fundo */}
+        <div aria-hidden="true" className="absolute inset-0">
+          <Image
+            src="/img/equipe.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="cine-image object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-green-900 via-green-900/92 to-green-900/55" />
+          <div className="absolute inset-0 bg-gradient-to-t from-green-900 via-green-900/40 to-green-900/15" />
+          <div className="grain-overlay pointer-events-none absolute inset-0" />
+        </div>
+
+        {/* § como luz */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute -right-[6vw] -top-[16vh] select-none font-serif text-[28rem] leading-none text-gold-500/[0.06] sm:text-[40rem]"
+          className="cine-glow pointer-events-none absolute right-[-10vw] top-1/2 -translate-y-1/2 select-none font-serif text-[34rem] leading-none text-gold-500/[0.12] blur-[1px] sm:text-[48rem]"
         >
           §
         </span>
-        <Container className="relative grid gap-12 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:py-28">
-          <div>
-            <p className="flex items-center gap-2 text-sm">
+
+        <Container className="relative py-28 lg:py-36">
+          <div className="max-w-3xl">
+            <p
+              className="cine flex items-center gap-2 text-sm"
+              style={{ animationDelay: "0ms" }}
+            >
               <span aria-hidden="true" className="font-serif text-lg leading-none text-gold-400">
                 §
               </span>
@@ -56,15 +75,23 @@ export default function Home() {
                 Sento-Sé &amp; Advogados Associados · Salvador, Bahia
               </span>
             </p>
-            <h1 className="mt-6 max-w-2xl text-balance font-serif text-[clamp(2.5rem,1.6rem+3.4vw,4.25rem)] font-semibold leading-[1.04] tracking-tight text-white">
-              Advocacia séria, próxima e comprometida com o seu resultado.
+            <h1
+              className="cine mt-6 text-balance font-serif text-[clamp(2.75rem,1.5rem+4.4vw,5rem)] font-semibold leading-[1.02] tracking-tight text-white"
+              style={{ animationDelay: "90ms" }}
+            >
+              A presença que o seu caso exige.
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-white/70">
-              Atuação destacada em Direito Trabalhista, Cível, do Consumidor e
-              Médico, com ética, assertividade e foco em resultados efetivos
-              para pessoas e empresas.
+            <p
+              className="cine mt-7 max-w-xl text-lg leading-8 text-white/75"
+              style={{ animationDelay: "180ms" }}
+            >
+              Atuação em Direito Trabalhista, Cível, do Consumidor e Médico, em
+              Salvador, com a firmeza e o cuidado que cada causa merece.
             </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <div
+              className="cine mt-9 flex flex-col gap-3 sm:flex-row"
+              style={{ animationDelay: "270ms" }}
+            >
               <Button href={whatsappUrl} variant="accent" size="lg">
                 Fale conosco
               </Button>
@@ -72,7 +99,10 @@ export default function Home() {
                 Áreas de atuação
               </Button>
             </div>
-            <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/55">
+            <div
+              className="cine mt-12 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/55"
+              style={{ animationDelay: "360ms" }}
+            >
               {credentials.map((c, i) => (
                 <span key={c} className="flex items-center gap-5">
                   {i > 0 && (
@@ -84,27 +114,6 @@ export default function Home() {
                   {c}
                 </span>
               ))}
-            </div>
-          </div>
-
-          <div className="relative">
-            <div className="overflow-hidden rounded-2xl shadow-lift ring-1 ring-gold-500/25">
-              <div className="relative aspect-[4/3]">
-                <Image
-                  src="/img/equipe.jpg"
-                  alt="Advogados e advogadas do escritório Sento-Sé reunidos na sede, em Salvador"
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 45vw"
-                  className="object-cover"
-                />
-              </div>
-            </div>
-            <div className="absolute -bottom-5 -left-5 hidden rounded-xl bg-paper p-4 shadow-card sm:block">
-              <Stars rating={5} />
-              <p className="mt-1 text-xs font-medium text-muted">
-                Avaliações de clientes
-              </p>
             </div>
           </div>
         </Container>
@@ -214,8 +223,12 @@ export default function Home() {
       </section>
 
       {/* DEPOIMENTOS */}
-      <section className="section-y bg-green-800">
-        <Container>
+      <section className="section-y relative isolate overflow-hidden bg-green-900">
+        <div
+          aria-hidden="true"
+          className="grain-overlay pointer-events-none absolute inset-0"
+        />
+        <Container className="relative">
           <MotionReveal>
             <SectionHeading
               number="04"
@@ -262,8 +275,12 @@ export default function Home() {
       </section>
 
       {/* CTA FINAL */}
-      <section className="bg-green-900">
-        <Container className="grid gap-8 py-16 lg:grid-cols-2 lg:items-center lg:py-20">
+      <section className="relative isolate overflow-hidden bg-green-900">
+        <div
+          aria-hidden="true"
+          className="grain-overlay pointer-events-none absolute inset-0"
+        />
+        <Container className="relative grid gap-8 py-16 lg:grid-cols-2 lg:items-center lg:py-20">
           <div>
             <h2 className="font-serif text-3xl font-semibold tracking-tight text-white sm:text-4xl">
               Precisa de orientação jurídica?
