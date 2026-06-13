@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# ferramentas locais de design (skill impeccable)
+/.claude/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

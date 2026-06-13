@@ -41,22 +41,37 @@ export function SectionHeading({
       )}
     >
       {(eyebrow || number) && (
-        <div
-          className={cn(
-            "flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em]",
-            onDark ? "text-gold-400" : "text-gold-600",
-          )}
-        >
+        <div className="flex items-center gap-2.5 text-sm">
+          <span
+            aria-hidden="true"
+            className={cn(
+              "font-serif text-lg leading-none",
+              onDark ? "text-gold-400" : "text-gold-500",
+            )}
+          >
+            §
+          </span>
           {number && (
-            <span aria-hidden="true" className="tabular-nums">
+            <span
+              aria-hidden="true"
+              className={cn(
+                "font-serif tabular-nums",
+                onDark ? "text-gold-400" : "text-gold-600",
+              )}
+            >
               {number}
             </span>
           )}
-          <span
-            aria-hidden="true"
-            className={cn("h-px w-8 bg-gold-500/60", !number && "hidden")}
-          />
-          {eyebrow && <span>{eyebrow}</span>}
+          {eyebrow && (
+            <span
+              className={cn(
+                "font-medium",
+                onDark ? "text-white/90" : "text-green-800",
+              )}
+            >
+              {eyebrow}
+            </span>
+          )}
         </div>
       )}
 

@@ -27,8 +27,14 @@ export function PageHeader({
           </div>
         )}
         {eyebrow && (
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-600">
-            {eyebrow}
+          <p className="flex items-center gap-2 text-sm">
+            <span
+              aria-hidden="true"
+              className="font-serif text-lg leading-none text-gold-500"
+            >
+              §
+            </span>
+            <span className="font-medium text-green-800">{eyebrow}</span>
           </p>
         )}
         <h1 className="mt-3 max-w-3xl text-balance font-serif text-[clamp(2rem,1.4rem+2.6vw,3.25rem)] font-semibold leading-[1.08] tracking-tight text-ink">

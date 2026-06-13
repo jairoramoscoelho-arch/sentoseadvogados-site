@@ -16,7 +16,7 @@ export const faqs = [
     id: "onde-fica",
     question: "Onde fica o escritório?",
     answer:
-      "Nossa sede fica na Avenida Tancredo Neves, 2227, Edifício Salvador Prime, Torre Work, sala 517, no bairro Caminho das Árvores, em Salvador — Bahia, um dos principais centros empresariais da cidade.",
+      "Nossa sede fica na Avenida Tancredo Neves, 2227, Edifício Salvador Prime, Torre Work, sala 517, no bairro Caminho das Árvores, em Salvador, Bahia, um dos principais centros empresariais da cidade.",
   },
   {
     id: "agendar",
@@ -40,7 +40,7 @@ export const faqs = [
     id: "primeira-consulta",
     question: "O que levar para a primeira consulta?",
     answer:
-      "Sempre que possível, reúna os documentos relacionados ao caso — contratos, comprovantes, mensagens, documentos pessoais e qualquer notificação recebida. Esses materiais ajudam na análise inicial da sua situação.",
+      "Sempre que possível, reúna os documentos relacionados ao caso: contratos, comprovantes, mensagens, documentos pessoais e qualquer notificação recebida. Esses materiais ajudam na análise inicial da sua situação.",
   },
   {
     id: "regioes",

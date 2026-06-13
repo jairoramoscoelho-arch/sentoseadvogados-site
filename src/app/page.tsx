@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Check, ArrowRight } from "lucide-react";
-import logo from "@/assets/logo.png";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -18,10 +17,10 @@ import {
 } from "@/lib/content";
 import { whatsappUrl } from "@/content/site";
 
-const trust = [
-  "Equipe com mestrado e doutorado",
-  "Atendimento presencial e on-line",
-  "No Edifício Salvador Prime",
+const credentials = [
+  "Formação pela UFBA",
+  "Mestrado e doutorado",
+  "Edifício Salvador Prime",
 ];
 
 const diferenciais = [
@@ -40,56 +39,60 @@ export default function Home() {
   return (
     <>
       {/* HERO */}
-      <section className="relative overflow-hidden bg-cream">
-        <Image
-          src={logo}
-          alt=""
+      <section className="relative overflow-hidden bg-gradient-to-br from-green-900 via-green-900 to-green-800 text-white">
+        <span
           aria-hidden="true"
-          className="pointer-events-none absolute -right-16 top-1/2 hidden h-[130%] w-auto -translate-y-1/2 opacity-[0.04] lg:block"
-        />
+          className="pointer-events-none absolute -right-[6vw] -top-[16vh] select-none font-serif text-[28rem] leading-none text-gold-500/[0.06] sm:text-[40rem]"
+        >
+          §
+        </span>
         <Container className="relative grid gap-12 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:py-28">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gold-600">
-              Sento-Sé &amp; Advogados Associados · Salvador — BA
+            <p className="flex items-center gap-2 text-sm">
+              <span aria-hidden="true" className="font-serif text-lg leading-none text-gold-400">
+                §
+              </span>
+              <span className="font-medium text-white/75">
+                Sento-Sé &amp; Advogados Associados · Salvador, Bahia
+              </span>
             </p>
-            <h1 className="mt-5 max-w-xl text-balance font-serif text-[clamp(2.25rem,1.5rem+3vw,3.75rem)] font-semibold leading-[1.05] tracking-tight text-ink">
+            <h1 className="mt-6 max-w-2xl text-balance font-serif text-[clamp(2.5rem,1.6rem+3.4vw,4.25rem)] font-semibold leading-[1.04] tracking-tight text-white">
               Advocacia séria, próxima e comprometida com o seu resultado.
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-muted">
+            <p className="mt-6 max-w-xl text-lg leading-8 text-white/70">
               Atuação destacada em Direito Trabalhista, Cível, do Consumidor e
               Médico, com ética, assertividade e foco em resultados efetivos
               para pessoas e empresas.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Button href={whatsappUrl} variant="primary" size="lg">
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Button href={whatsappUrl} variant="accent" size="lg">
                 Fale conosco
               </Button>
-              <Button href="/areas" variant="outline" size="lg">
+              <Button href="/areas" variant="light" size="lg">
                 Áreas de atuação
               </Button>
             </div>
-            <ul className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-x-6">
-              {trust.map((item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-2 text-sm text-ink/70"
-                >
-                  <Check
-                    className="h-4 w-4 shrink-0 text-green-700"
-                    aria-hidden="true"
-                  />
-                  {item}
-                </li>
+            <div className="mt-10 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/55">
+              {credentials.map((c, i) => (
+                <span key={c} className="flex items-center gap-5">
+                  {i > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className="hidden h-1 w-1 rounded-full bg-gold-400 sm:block"
+                    />
+                  )}
+                  {c}
+                </span>
               ))}
-            </ul>
+            </div>
           </div>
 
           <div className="relative">
-            <div className="overflow-hidden rounded-2xl shadow-lift ring-1 ring-green-900/10">
+            <div className="overflow-hidden rounded-2xl shadow-lift ring-1 ring-gold-500/25">
               <div className="relative aspect-[4/3]">
                 <Image
                   src="/img/equipe.jpg"
-                  alt="Equipe do escritório Sento-Sé Advogados, em Salvador"
+                  alt="Advogados e advogadas do escritório Sento-Sé reunidos na sede, em Salvador"
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 45vw"

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Libre_Caslon_Text, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { site } from "@/content/site";
@@ -9,13 +9,17 @@ import { WhatsAppFloat } from "@/components/layout/WhatsAppFloat";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { organizationLd, webSiteLd } from "@/lib/jsonld";
 
-const serif = Fraunces({
-  subsets: ["latin", "latin-ext"],
+// Caslon: herança da tipografia jurídica/impressa — distintivo e autoral,
+// fugindo das fontes "padrão de IA". Hanken Grotesk: sans humanista e clara.
+const serif = Libre_Caslon_Text({
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
+  subsets: ["latin"],
   variable: "--font-serif-display",
   display: "swap",
 });
 
-const sans = Inter({
+const sans = Hanken_Grotesk({
   subsets: ["latin", "latin-ext"],
   variable: "--font-sans-body",
   display: "swap",

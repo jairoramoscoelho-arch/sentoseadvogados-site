@@ -24,7 +24,7 @@ export function organizationLd() {
     priceRange: "$$",
     address: {
       "@type": "PostalAddress",
-      streetAddress: `${site.address.street}, ${site.address.number} — ${site.address.complement}`,
+      streetAddress: `${site.address.street}, ${site.address.number}, ${site.address.complement}`,
       addressLocality: site.address.city,
       addressRegion: site.address.state,
       postalCode: site.address.postalCode,

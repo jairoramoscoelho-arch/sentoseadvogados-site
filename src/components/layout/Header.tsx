@@ -8,7 +8,7 @@ import { whatsappUrl } from "@/content/site";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 border-b border-line/70 bg-paper/85 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-line bg-paper shadow-[0_1px_2px_rgba(8,51,42,0.04)]">
       <Container className="flex h-16 items-center justify-between gap-6 sm:h-20">
         <Logo />
 

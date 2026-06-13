@@ -52,7 +52,7 @@ export const areas = [
     seo: {
       title: "Advogado Cível em Salvador",
       description:
-        "Direito Civil em Salvador: contratos, indenizações, responsabilidade civil, dívidas, posse e propriedade — consultoria e representação judicial e extrajudicial.",
+        "Direito Civil em Salvador: contratos, indenizações, responsabilidade civil, dívidas, posse e propriedade. Consultoria e representação judicial e extrajudicial.",
     },
   },
   {

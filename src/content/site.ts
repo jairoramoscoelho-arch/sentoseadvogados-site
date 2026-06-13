@@ -45,7 +45,7 @@ export const site = {
 } satisfies SiteConfig;
 
 /** Endereço em uma linha, para exibição e mapa. */
-export const fullAddress = `${site.address.street}, ${site.address.number} — ${site.address.complement}, ${site.address.neighborhood}, ${site.address.city} — ${site.address.state}`;
+export const fullAddress = `${site.address.street}, ${site.address.number}, ${site.address.complement}, ${site.address.neighborhood}, ${site.address.city}, ${site.address.state}`;
 
 /** URL do WhatsApp com mensagem padrão. */
 export const whatsappUrl = `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(
