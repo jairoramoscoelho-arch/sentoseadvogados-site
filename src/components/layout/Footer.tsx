@@ -60,7 +60,7 @@ export function Footer() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-white/70 transition-colors hover:text-white"
+                  className="text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline"
                 >
                   {item.label}
                 </Link>
@@ -69,7 +69,7 @@ export function Footer() {
             <li>
               <Link
                 href="/faq"
-                className="text-white/70 transition-colors hover:text-white"
+                className="text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline"
               >
                 Perguntas frequentes
               </Link>
@@ -87,7 +87,7 @@ export function Footer() {
               <li key={area.slug}>
                 <Link
                   href={`/areas/${area.slug}`}
-                  className="text-white/70 transition-colors hover:text-white"
+                  className="text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline"
                 >
                   {area.name}
                 </Link>
@@ -111,7 +111,7 @@ export function Footer() {
                 href={mapsDirectionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="leading-6 text-white/70 transition-colors hover:text-white"
+                className="leading-6 text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline"
               >
                 {fullAddress}
               </a>
@@ -123,7 +123,7 @@ export function Footer() {
               />
               <a
                 href={`tel:${site.phone}`}
-                className="text-white/70 transition-colors hover:text-white"
+                className="text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline"
               >
                 {site.phoneDisplay}
               </a>

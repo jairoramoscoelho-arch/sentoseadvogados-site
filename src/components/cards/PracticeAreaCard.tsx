@@ -8,7 +8,7 @@ export function PracticeAreaCard({ area }: { area: PracticeArea }) {
   return (
     <Link
       href={`/areas/${area.slug}`}
-      className="group relative flex flex-col rounded-xl border border-white/10 bg-white/[0.03] p-7 transition-all duration-200 hover:-translate-y-0.5 hover:border-gold-500/40 hover:bg-white/[0.06]"
+      className="group relative flex flex-col rounded-xl border border-white/10 bg-white/[0.03] p-7 transition-all duration-300 ease-out-quart hover:-translate-y-1 hover:border-gold-500/40 hover:bg-white/[0.06] hover:shadow-lift"
     >
       <div className="flex items-baseline gap-3">
         <span className="font-serif text-4xl leading-none tabular-nums text-gold-400">

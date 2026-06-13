@@ -39,10 +39,17 @@ export function FAQAccordion({ items }: { items: FaqItem[] }) {
               id={`faq-panel-${item.id}`}
               role="region"
               aria-labelledby={`faq-btn-${item.id}`}
-              hidden={!isOpen}
-              className="px-6 pb-6"
+              inert={!isOpen}
+              className={cn(
+                "grid transition-[grid-template-rows] duration-300 ease-out-quart",
+                isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+              )}
             >
-              <p className="text-sm leading-7 text-muted">{item.answer}</p>
+              <div className="overflow-hidden">
+                <p className="px-6 pb-6 text-sm leading-7 text-muted">
+                  {item.answer}
+                </p>
+              </div>
             </div>
           </div>
         );

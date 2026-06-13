@@ -30,15 +30,24 @@ export async function generateMetadata({
   const { slug } = await params;
   const lawyer = getLawyerBySlug(slug);
   if (!lawyer) return {};
+  const title = lawyer.seo?.title ?? `${lawyer.name} — ${lawyer.role}`;
+  const description =
+    lawyer.seo?.description ??
+    `${lawyer.name}, ${lawyer.role} no Sento-Sé Advogados. ${lawyer.bio}`.slice(
+      0,
+      160,
+    );
   return {
-    title: lawyer.seo?.title ?? `${lawyer.name} — ${lawyer.role}`,
-    description:
-      lawyer.seo?.description ??
-      `${lawyer.name}, ${lawyer.role} no Sento-Sé Advogados. ${lawyer.bio}`.slice(
-        0,
-        160,
-      ),
+    title,
+    description,
     alternates: { canonical: `/equipe/${lawyer.slug}` },
+    openGraph: {
+      type: "profile",
+      title,
+      description,
+      url: `/equipe/${lawyer.slug}`,
+      ...(lawyer.photo ? { images: [lawyer.photo] } : {}),
+    },
   };
 }
 

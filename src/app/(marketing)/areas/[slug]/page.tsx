@@ -34,6 +34,12 @@ export async function generateMetadata({
     title: area.seo.title,
     description: area.seo.description,
     alternates: { canonical: `/areas/${area.slug}` },
+    openGraph: {
+      type: "article",
+      title: area.seo.title,
+      description: area.seo.description,
+      url: `/areas/${area.slug}`,
+    },
   };
 }
 

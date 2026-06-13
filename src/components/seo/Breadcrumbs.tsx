@@ -26,7 +26,7 @@ export function Breadcrumbs({
                 <ChevronRight
                   className={cn(
                     "h-3.5 w-3.5",
-                    onDark ? "text-white/30" : "text-line",
+                    onDark ? "text-white/40" : "text-line",
                   )}
                   aria-hidden="true"
                 />
@@ -44,7 +44,7 @@ export function Breadcrumbs({
                   className={cn(
                     "transition-colors",
                     onDark
-                      ? "text-white/55 hover:text-gold-400"
+                      ? "text-white/75 hover:text-gold-400"
                       : "text-muted hover:text-green-700",
                   )}
                 >

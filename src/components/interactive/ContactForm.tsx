@@ -1,12 +1,13 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { submitContact } from "@/app/(marketing)/contato/actions";
 import { initialContactState } from "@/lib/contact";
 
 const fieldBase =
-  "w-full rounded-lg border bg-paper px-4 py-3 text-sm text-ink shadow-soft transition-colors placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-gold-500/60";
+  "w-full rounded-lg border bg-paper px-4 py-3 text-sm text-ink shadow-soft transition-colors placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:ring-offset-1";
 
 function fieldClass(hasError?: boolean) {
   return cn(
@@ -121,8 +122,9 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex h-12 items-center justify-center rounded-full bg-green-700 px-7 text-sm font-medium text-white transition-colors hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-green-700 px-7 text-sm font-medium text-white transition duration-200 ease-out hover:bg-green-800 motion-safe:hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
       >
+        {pending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
         {pending ? "Enviando…" : "Enviar mensagem"}
       </button>
 
