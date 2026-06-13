@@ -16,12 +16,6 @@ import {
 } from "@/lib/content";
 import { whatsappUrl } from "@/content/site";
 
-const credentials = [
-  "Formação pela UFBA",
-  "Mestrado e doutorado",
-  "Edifício Salvador Prime",
-];
-
 const diferenciais = [
   "Equipe com sólida formação acadêmica (mestrado e doutorado)",
   "Atendimento próximo, claro e personalizado",
@@ -98,22 +92,6 @@ export default function Home() {
               <Button href="/areas" variant="light" size="lg">
                 Áreas de atuação
               </Button>
-            </div>
-            <div
-              className="cine mt-12 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/55"
-              style={{ animationDelay: "360ms" }}
-            >
-              {credentials.map((c, i) => (
-                <span key={c} className="flex items-center gap-5">
-                  {i > 0 && (
-                    <span
-                      aria-hidden="true"
-                      className="hidden h-1 w-1 rounded-full bg-gold-400 sm:block"
-                    />
-                  )}
-                  {c}
-                </span>
-              ))}
             </div>
           </div>
         </Container>
