@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ------------------------------------------------------------------ *
+ * Design tokens — Sento-Sé & Advogados Associados
+ * Paleta derivada do logotipo (verde profundo + dourado) sobre off-white.
+ * ------------------------------------------------------------------ */
+@theme {
+  /* Verde da marca (primária) */
+  --color-green-50: #f0f5f3;
+  --color-green-100: #dde9e5;
+  --color-green-200: #c3d8d1;
+  --color-green-600: #1a6e59;
+  --color-green-700: #115c4a; /* principal */
+  --color-green-800: #0e4a3d;
+  --color-green-900: #08332a; /* mais escuro (rodapé) */
+
+  /* Dourado da marca (acento) */
+  --color-gold-100: #f4ebd9;
+  --color-gold-200: #e9d6b3;
+  --color-gold-400: #cda668;
+  --color-gold-500: #c0995a; /* dourado da marca */
+  --color-gold-600: #a87b3d; /* dourado escuro p/ texto grande */
+  --color-gold-700: #8a6430;
+
+  /* Neutros quentes */
+  --color-ink: #16201c; /* texto principal */
+  --color-paper: #ffffff;
+  --color-cream: #f7f4ee; /* off-white quente (seções) */
+  --color-cloud: #f1f3f1;
+  --color-line: #e4e7e3; /* bordas */
+  --color-muted: #5c665f; /* texto secundário */
+
+  /* Semânticos */
+  --color-background: var(--color-paper);
+  --color-foreground: var(--color-ink);
+  --color-primary: var(--color-green-700);
+  --color-accent: var(--color-gold-500);
+
+  /* Tipografia (injetada por next/font no <html>) */
+  --font-serif: var(--font-serif-display);
+  --font-sans: var(--font-sans-body);
+
+  /* Raio */
+  --radius-sm: 4px;
+  --radius-md: 10px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+
+  /* Sombras */
+  --shadow-soft: 0 1px 3px rgba(8, 51, 42, 0.08);
+  --shadow-card: 0 1px 2px rgba(8, 51, 42, 0.06), 0 12px 32px -12px rgba(8, 51, 42, 0.18);
+  --shadow-lift: 0 2px 4px rgba(8, 51, 42, 0.06), 0 24px 48px -16px rgba(8, 51, 42, 0.22);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Compensa o header fixo ao navegar por âncoras */
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: var(--color-gold-200);
+    color: var(--color-green-900);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold-500);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Sem JavaScript: garante que elementos com reveal fiquem visíveis. */
+  @media (scripting: none) {
+    [data-reveal] {
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ------------------------------------------------------------------ *
+ * Utilitários de composição
+ * ------------------------------------------------------------------ */
+@layer components {
+  /* Espaçamento vertical de seção, consistente e responsivo */
+  .section-y {
+    padding-block: clamp(4rem, 8vw, 8rem);
+  }
 }
