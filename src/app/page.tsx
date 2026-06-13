@@ -120,14 +120,22 @@ export default function Home() {
       </section>
 
       {/* ÁREAS */}
-      <section className="section-y">
-        <Container>
+      <section
+        id="areas"
+        className="section-y relative isolate overflow-hidden bg-green-900"
+      >
+        <div
+          aria-hidden="true"
+          className="grain-overlay pointer-events-none absolute inset-0"
+        />
+        <Container className="relative">
           <MotionReveal>
             <SectionHeading
               number="01"
               eyebrow="Áreas de Atuação"
               title="Onde podemos ajudar você"
               intro="Atuamos de forma personalizada em cada área, buscando a solução mais adequada e segura para o seu caso."
+              tone="onDark"
             />
           </MotionReveal>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -137,6 +145,36 @@ export default function Home() {
               </MotionReveal>
             ))}
           </div>
+        </Container>
+      </section>
+
+      {/* MANIFESTO */}
+      <section className="relative isolate overflow-hidden border-t border-white/5 bg-green-900 text-white">
+        <div
+          aria-hidden="true"
+          className="grain-overlay pointer-events-none absolute inset-0"
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none font-serif text-[24rem] leading-none text-gold-500/[0.07] blur-[1px] sm:text-[34rem]"
+        >
+          §
+        </span>
+        <Container className="relative py-24 lg:py-32">
+          <MotionReveal>
+            <p className="mx-auto max-w-4xl text-balance text-center font-serif text-[clamp(1.75rem,1.1rem+2.6vw,3rem)] font-medium italic leading-[1.3] text-white">
+              Defendemos pessoas e empresas com a firmeza que a lei exige e o
+              cuidado que cada história merece.
+            </p>
+            <p className="mt-8 flex items-center justify-center gap-2 text-sm">
+              <span aria-hidden="true" className="font-serif text-base text-gold-400">
+                §
+              </span>
+              <span className="font-medium text-gold-400">
+                Sento-Sé &amp; Advogados Associados
+              </span>
+            </p>
+          </MotionReveal>
         </Container>
       </section>
 
@@ -152,6 +190,10 @@ export default function Home() {
                   fill
                   sizes="(max-width: 1024px) 100vw, 45vw"
                   className="object-cover"
+                />
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 bg-green-900/20 mix-blend-multiply"
                 />
               </div>
             </div>

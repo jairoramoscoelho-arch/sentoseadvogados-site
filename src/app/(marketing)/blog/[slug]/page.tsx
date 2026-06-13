@@ -66,21 +66,25 @@ export default async function BlogPostPage({
     <article>
       <JsonLd data={blogPostingLd(post)} />
       <JsonLd data={breadcrumbLd(crumbs)} />
-      <header className="border-b border-line bg-cream">
-        <Container width="narrow" className="py-12 lg:py-16">
+      <header className="relative isolate overflow-hidden bg-green-900 text-white">
+        <div
+          aria-hidden="true"
+          className="grain-overlay pointer-events-none absolute inset-0"
+        />
+        <Container width="narrow" className="relative py-12 lg:py-16">
           <div className="mb-6">
-            <Breadcrumbs items={crumbs} />
+            <Breadcrumbs items={crumbs} tone="onDark" />
           </div>
-          <div className="flex items-center gap-3 text-xs text-muted">
-            <span className="rounded-full bg-green-50 px-2.5 py-1 font-medium text-green-700">
+          <div className="flex items-center gap-3 text-xs text-white/60">
+            <span className="rounded-full bg-white/10 px-2.5 py-1 font-medium text-gold-400">
               {post.category}
             </span>
             <time dateTime={post.date}>{formatDatePtBr(post.date)}</time>
           </div>
-          <h1 className="mt-4 font-serif text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] font-semibold leading-[1.1] tracking-tight text-ink">
+          <h1 className="mt-4 font-serif text-[clamp(1.875rem,1.4rem+2.2vw,3rem)] font-semibold leading-[1.1] tracking-tight text-white">
             {post.title}
           </h1>
-          <p className="mt-4 text-sm text-muted">
+          <p className="mt-4 text-sm text-white/60">
             Por {formatAuthors(post.authors)}
           </p>
         </Container>

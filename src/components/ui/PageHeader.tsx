@@ -18,30 +18,42 @@ export function PageHeader({
   breadcrumbs,
 }: PageHeaderProps) {
   return (
-    <section className="border-b border-line bg-cream">
-      <Container className="py-12 lg:py-16">
+    <section className="relative isolate overflow-hidden bg-green-900 text-white">
+      <div
+        aria-hidden="true"
+        className="grain-overlay pointer-events-none absolute inset-0"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-[-6vw] top-1/2 -translate-y-1/2 select-none font-serif text-[18rem] leading-none text-gold-500/[0.08] blur-[1px] sm:text-[26rem]"
+      >
+        §
+      </span>
+      <Container className="relative py-16 lg:py-24">
         {breadcrumbs && (
-          <div className="mb-6">
+          <div className="mb-7">
             <JsonLd data={breadcrumbLd(breadcrumbs)} />
-            <Breadcrumbs items={breadcrumbs} />
+            <Breadcrumbs items={breadcrumbs} tone="onDark" />
           </div>
         )}
         {eyebrow && (
           <p className="flex items-center gap-2 text-sm">
             <span
               aria-hidden="true"
-              className="font-serif text-lg leading-none text-gold-500"
+              className="font-serif text-lg leading-none text-gold-400"
             >
               §
             </span>
-            <span className="font-medium text-green-800">{eyebrow}</span>
+            <span className="font-medium text-white/80">{eyebrow}</span>
           </p>
         )}
-        <h1 className="mt-3 max-w-3xl text-balance font-serif text-[clamp(2rem,1.4rem+2.6vw,3.25rem)] font-semibold leading-[1.08] tracking-tight text-ink">
+        <h1 className="mt-4 max-w-3xl text-balance font-serif text-[clamp(2.25rem,1.5rem+3vw,3.5rem)] font-semibold leading-[1.06] tracking-tight text-white">
           {title}
         </h1>
         {intro && (
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">{intro}</p>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-white/70">
+            {intro}
+          </p>
         )}
       </Container>
     </section>
