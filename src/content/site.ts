@@ -1,6 +1,20 @@
 import type { SiteConfig } from "./types";
 
 /**
+ * URL base canônica do site. Ordem de prioridade:
+ * 1. NEXT_PUBLIC_SITE_URL (defina ao usar domínio próprio);
+ * 2. VERCEL_PROJECT_PRODUCTION_URL (preenchido automaticamente pela Vercel);
+ * 3. localhost (desenvolvimento).
+ */
+function resolveBaseUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit.replace(/\/$/, "");
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercel) return `https://${vercel}`;
+  return "http://localhost:3000";
+}
+
+/**
  * Configuração central do escritório (NAP, redes, geo, horário).
  * Single source of truth para metadata, JSON-LD, rodapé e página de contato.
  */
@@ -10,10 +24,7 @@ export const site = {
   alternateName: "SSEadv",
   description:
     "Escritório de advocacia em Salvador (BA) com atuação destacada em Direito Trabalhista, Cível, do Consumidor e Médico. Ética, assertividade e resultados efetivos.",
-  baseUrl: (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(
-    /\/$/,
-    "",
-  ),
+  baseUrl: resolveBaseUrl(),
   phone: "+5571993510900",
   phoneDisplay: "(71) 99351-0900",
   whatsapp: "5571993510900",
