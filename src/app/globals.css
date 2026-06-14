@@ -122,6 +122,20 @@
 }
 
 /* ------------------------------------------------------------------ *
+ * Formulários — evita o auto-zoom do iOS Safari ao focar um campo.
+ * Campos com fonte < 16px disparam zoom no foco; após um redirect
+ * (ex.: login → dashboard) o usuário fica "preso" no zoom. Fora de
+ * @layer de propósito, para vencer as utilitárias do Tailwind (text-sm).
+ * ------------------------------------------------------------------ */
+@media (max-width: 640px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+/* ------------------------------------------------------------------ *
  * Utilitários de composição
  * ------------------------------------------------------------------ */
 @layer components {

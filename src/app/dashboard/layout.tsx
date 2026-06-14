@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { requireSession } from "@/lib/auth/dal";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
+import { DashboardFab } from "@/components/dashboard/DashboardFab";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ export default async function DashboardLayout({
         profile={{ full_name: profile.full_name, role: profile.role }}
       />
       <main className="p-6 lg:ml-64 lg:p-10">{children}</main>
+      <DashboardFab />
     </div>
   );
 }
