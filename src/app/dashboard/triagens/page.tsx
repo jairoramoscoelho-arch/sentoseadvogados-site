@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { listRecentIntakes } from "@/lib/data/clients";
+import { listOpenIntakes } from "@/lib/data/clients";
 import { formatDatePtBr } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +9,8 @@ function cap(s: string) {
 }
 
 export default async function TriagensPage() {
-  const intakes = await listRecentIntakes(100);
+  // Apenas triagens que ainda não viraram peça — ao gerar a peça, ela sai daqui.
+  const intakes = await listOpenIntakes(100);
 
   return (
     <div>

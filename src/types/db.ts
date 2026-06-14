@@ -52,6 +52,7 @@ export interface LegalDraft {
   id: string;
   client_id: string;
   case_id: string | null;
+  intake_id: string | null;
   template_id: string | null;
   title: string;
   status: DraftStatus;

@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus, Users, FileText } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Plus, Users, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const actions = [
-  { href: "/dashboard/pecas/nova", label: "Nova peça", icon: FileText },
+  { href: "/dashboard/pecas/nova", label: "Nova triagem", icon: ClipboardList },
   { href: "/dashboard/clientes", label: "Novo cliente", icon: Users },
 ];
 
@@ -18,6 +19,7 @@ const actions = [
  * globalmente em globals.css (transições instantâneas).
  */
 export function DashboardFab() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -28,6 +30,10 @@ export function DashboardFab() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  // Some na tela de triagem (nova) e no editor da peça (/pecas/[id]) — lá o foco
+  // é a escrita; o "+" só distrai (e cobre o box de edição).
+  if (pathname?.startsWith("/dashboard/pecas/")) return null;
 
   return (
     <>
