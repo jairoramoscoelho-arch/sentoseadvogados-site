@@ -10,11 +10,19 @@ import { computeNextVersionNo } from "@/lib/data/version";
 import { TriageSchema } from "@/lib/ai/triage";
 import { STUDIO_MODEL } from "@/lib/ai/anthropic";
 
-const createSchema = z.object({ intakeId: z.string().uuid() });
+const createSchema = z.object({
+  intakeId: z.string().uuid(),
+  styleAuthors: z.array(z.string()).default([]),
+  styleInstruction: z.string().max(2000).optional(),
+});
 
 export async function createDraftFromIntake(formData: FormData): Promise<void> {
   const profile = await requireSession();
-  const parsed = createSchema.safeParse({ intakeId: formData.get("intakeId") });
+  const parsed = createSchema.safeParse({
+    intakeId: formData.get("intakeId"),
+    styleAuthors: formData.getAll("styleAuthors").map((v) => String(v)),
+    styleInstruction: (formData.get("styleInstruction") as string) || undefined,
+  });
   if (!parsed.success) redirect("/dashboard/pecas");
 
   const intake = await getIntake(parsed.data.intakeId);
@@ -32,6 +40,11 @@ export async function createDraftFromIntake(formData: FormData): Promise<void> {
       client_id: intake.client_id,
       case_id: intake.case_id,
       intake_id: intake.id,
+      style_authors: parsed.data.styleAuthors,
+      style_instruction:
+        parsed.data.styleAuthors.length > 0
+          ? null
+          : parsed.data.styleInstruction ?? null,
       title,
       status: "rascunho",
       model_used: STUDIO_MODEL,
