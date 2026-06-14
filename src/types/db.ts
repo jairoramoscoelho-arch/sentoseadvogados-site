@@ -59,6 +59,8 @@ export interface LegalDraft {
   content_html: string | null;
   model_used: string | null;
   style_id: string | null;
+  style_authors: string[];
+  style_instruction: string | null;
   created_by: string | null;
   assigned_to: string | null;
   created_at: string;

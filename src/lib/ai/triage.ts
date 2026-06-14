@@ -5,6 +5,8 @@ import { createAnthropicClient, STUDIO_MODEL } from "./anthropic";
 
 export const TRIAGE_AREAS = ["trabalhista", "civel", "consumidor", "medico", "outro"] as const;
 
+export type TriageArea = (typeof TRIAGE_AREAS)[number];
+
 // Sem .optional()/constraints numéricas — saída estruturada exige campos previsíveis.
 export const TriageSchema = z.object({
   area: z.enum(TRIAGE_AREAS),

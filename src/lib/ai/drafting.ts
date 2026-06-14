@@ -2,6 +2,26 @@ import "server-only";
 import { createAnthropicClient, STUDIO_MODEL } from "./anthropic";
 import type { TriageResult } from "./triage";
 
+export interface DraftStyle {
+  authors: string[];
+  instruction: string | null;
+}
+
+function styleSection(style: DraftStyle | undefined): string {
+  if (!style) return "";
+  const parts: string[] = [];
+  if (style.authors.length > 0) {
+    parts.push(
+      `Inspire-se na VOZ e na DOUTRINA de ${style.authors.join("; ")} — emule o estilo (tom, estrutura, retórica) e, quando pertinente, invoque as teses/posições doutrinárias desse autor como reforço argumentativo, SEM inventar fatos do caso nem citações de que você não tenha certeza.`,
+    );
+  }
+  const instr = style.instruction?.trim();
+  if (instr) {
+    parts.push(`Instruções de estilo do advogado: ${instr}`);
+  }
+  return parts.length > 0 ? `\n\nESTILO E DOUTRINA:\n${parts.join("\n")}` : "";
+}
+
 export function buildDraftSystemPrompt(): string {
   return `Você é redator(a) forense sênior do escritório Sento-Sé & Advogados Associados (Salvador/BA). Redige peças jurídicas em português jurídico brasileiro, prontas para REVISÃO do advogado.
 
@@ -39,6 +59,7 @@ export function draftMessages(
   triage: TriageResult,
   clientName: string,
   rawText: string,
+  style?: DraftStyle,
 ): Array<{ role: "user"; content: string }> {
   const teses = triage.teses
     .map((t, i) => `${i + 1}. ${t.titulo} — ${t.fundamento}`)
@@ -58,7 +79,7 @@ ${triage.observacoes ? `\nObservações/ressalvas: ${triage.observacoes}` : ""}
 RELATO DO CLIENTE (única fonte dos fatos — não invente nada além disto):
 """
 ${rawText}
-"""`;
+"""${styleSection(style)}`;
   return [{ role: "user", content }];
 }
 
@@ -67,6 +88,7 @@ export async function streamDraft(
   triage: TriageResult,
   clientName: string,
   rawText: string,
+  style?: DraftStyle,
 ) {
   const anthropic = await createAnthropicClient();
   return anthropic.messages.stream({
@@ -75,6 +97,6 @@ export async function streamDraft(
     thinking: { type: "adaptive" },
     output_config: { effort: "high" },
     system: buildDraftSystemPrompt(),
-    messages: draftMessages(triage, clientName, rawText),
+    messages: draftMessages(triage, clientName, rawText, style),
   });
 }

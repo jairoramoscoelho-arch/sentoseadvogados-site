@@ -10,6 +10,7 @@ const triage: TriageResult = {
   teses: [{ titulo: "Responsabilidade civil", fundamento: "art. 186 CC" }],
   tipo_peca_sugerido: "Petição inicial",
   jurisprudence_queries: ["dano moral"],
+  documentos_necessarios: [],
   observacoes: "",
 };
 
@@ -31,5 +32,30 @@ describe("drafting", () => {
   it("inicial cível referencia art. 319", () => {
     const [msg] = draftMessages(triage, "C", "h");
     expect(msg.content).toContain("319");
+  });
+  it("sem estilo, não inclui a seção ESTILO E DOUTRINA", () => {
+    const [msg] = draftMessages(triage, "C", "h");
+    expect(msg.content).not.toContain("ESTILO E DOUTRINA");
+  });
+  it("com autor, injeta o nome e a seção de estilo", () => {
+    const [msg] = draftMessages(triage, "C", "h", {
+      authors: ["Fredie Didier Jr."],
+      instruction: null,
+    });
+    expect(msg.content).toContain("ESTILO E DOUTRINA");
+    expect(msg.content).toContain("Fredie Didier Jr.");
+    expect(msg.content.toLowerCase()).toContain("doutrina");
+  });
+  it("com instrução livre, injeta o texto do advogado", () => {
+    const [msg] = draftMessages(triage, "C", "h", {
+      authors: [],
+      instruction: "tom assertivo, ênfase na dignidade",
+    });
+    expect(msg.content).toContain("ESTILO E DOUTRINA");
+    expect(msg.content).toContain("tom assertivo, ênfase na dignidade");
+  });
+  it("estilo vazio (sem autor e sem instrução) não cria a seção", () => {
+    const [msg] = draftMessages(triage, "C", "h", { authors: [], instruction: "" });
+    expect(msg.content).not.toContain("ESTILO E DOUTRINA");
   });
 });

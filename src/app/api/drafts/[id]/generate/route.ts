@@ -29,12 +29,18 @@ export async function POST(
 
   const client = await getClient(draft.client_id);
 
+  const style = {
+    authors: draft.style_authors ?? [],
+    instruction: draft.style_instruction,
+  };
+
   let messageStream;
   try {
     messageStream = await streamDraft(
       triage.data,
       client?.name ?? "o cliente",
       intake.raw_text ?? "",
+      style,
     );
   } catch (e) {
     if (e instanceof AnthropicNotConfiguredError) {
