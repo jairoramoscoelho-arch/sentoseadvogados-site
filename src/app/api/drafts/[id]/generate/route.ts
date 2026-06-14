@@ -41,6 +41,7 @@ export async function POST(
       client?.name ?? "o cliente",
       intake.raw_text ?? "",
       style,
+      draft.tipo ?? undefined,
     );
   } catch (e) {
     if (e instanceof AnthropicNotConfiguredError) {

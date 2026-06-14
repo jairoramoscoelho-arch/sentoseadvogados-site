@@ -34,7 +34,7 @@ export default async function NovaPecaPage({
   return (
     <div>
       <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">
-        {edit ? "Editar relato" : "Nova peça"}
+        {edit ? "Editar relato" : "Nova triagem"}
       </h1>
       <p className="mt-2 text-muted">
         {edit

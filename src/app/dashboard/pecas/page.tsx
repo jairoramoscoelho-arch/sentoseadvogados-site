@@ -20,7 +20,7 @@ export default async function PecasPage() {
           Peças
         </h1>
         <Link
-          href="/dashboard/pecas/nova"
+          href="/dashboard/pecas/criar"
           className="inline-flex h-11 shrink-0 items-center rounded-full bg-green-700 px-6 text-sm font-medium text-white transition-colors hover:bg-green-800"
         >
           Nova peça
