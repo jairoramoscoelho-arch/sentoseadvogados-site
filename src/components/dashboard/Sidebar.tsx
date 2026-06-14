@@ -9,6 +9,7 @@ import {
   Briefcase,
   CalendarDays,
   FileBarChart,
+  FileText,
   Settings,
   KeyRound,
   LogOut,
@@ -31,6 +32,7 @@ type NavItem = {
 const baseNav: NavItem[] = [
   { href: "/dashboard", label: "Visão geral", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/clientes", label: "Clientes", icon: Users },
+  { href: "/dashboard/pecas", label: "Peças", icon: FileText },
   { href: "/dashboard/casos", label: "Casos", icon: Briefcase },
   { href: "/dashboard/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/dashboard/relatorios", label: "Relatórios", icon: FileBarChart },
