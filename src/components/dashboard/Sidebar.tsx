@@ -10,16 +10,25 @@ import {
   CalendarDays,
   FileBarChart,
   Settings,
+  KeyRound,
   LogOut,
   Menu,
   X,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/layout/Logo";
 import { logout } from "@/app/dashboard/actions";
 import type { Role } from "@/lib/auth/dal";
 
-const baseNav = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  exact?: boolean;
+};
+
+const baseNav: NavItem[] = [
   { href: "/dashboard", label: "Visão geral", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/clientes", label: "Clientes", icon: Users },
   { href: "/dashboard/casos", label: "Casos", icon: Briefcase },
@@ -41,17 +50,13 @@ export function DashboardSidebar({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  const adminNav: NavItem[] = [
+    { href: "/dashboard/admin/integracoes", label: "Integrações", icon: KeyRound },
+    { href: "/dashboard/admin/usuarios", label: "Usuários", icon: Settings },
+  ];
+
   const items =
-    profile.role === "socio"
-      ? [
-          ...baseNav,
-          {
-            href: "/dashboard/admin/usuarios",
-            label: "Usuários",
-            icon: Settings,
-          },
-        ]
-      : baseNav;
+    profile.role === "socio" ? [...baseNav, ...adminNav] : baseNav;
 
   const isActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname.startsWith(href);
