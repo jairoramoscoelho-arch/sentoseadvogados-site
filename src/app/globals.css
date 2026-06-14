@@ -136,6 +136,55 @@
 }
 
 /* ------------------------------------------------------------------ *
+ * Conteúdo do editor de peças (Tiptap) — tipografia jurídica enxuta,
+ * sem depender do plugin de typography.
+ * ------------------------------------------------------------------ */
+.draft-content {
+  color: var(--color-ink);
+  font-size: 0.95rem;
+}
+.draft-content h2 {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 1.4rem;
+  margin-bottom: 0.4rem;
+}
+.draft-content h3 {
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+}
+.draft-content p {
+  margin-top: 0.6rem;
+  line-height: 1.7;
+}
+.draft-content ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+.draft-content ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+.draft-content li {
+  margin-top: 0.2rem;
+}
+.draft-content strong {
+  font-weight: 600;
+}
+.draft-content blockquote {
+  margin-top: 1rem;
+  border-radius: 10px;
+  background: var(--color-cloud);
+  padding: 0.75rem 1rem;
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+/* ------------------------------------------------------------------ *
  * Utilitários de composição
  * ------------------------------------------------------------------ */
 @layer components {
