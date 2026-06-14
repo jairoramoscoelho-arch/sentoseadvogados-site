@@ -44,7 +44,7 @@ export default async function ClientDetailPage({
       </div>
 
       <h2 className="mt-10 font-serif text-xl font-semibold text-ink">
-        Relatos &amp; triagens
+        Triagens
       </h2>
       <div className="mt-4">
         <IntakeList intakes={intakes} clientId={id} />

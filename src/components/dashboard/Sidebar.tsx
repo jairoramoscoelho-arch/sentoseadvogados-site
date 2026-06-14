@@ -6,9 +6,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Users,
-  Briefcase,
-  CalendarDays,
-  FileBarChart,
+  ClipboardList,
   FileText,
   Settings,
   KeyRound,
@@ -30,12 +28,10 @@ type NavItem = {
 };
 
 const baseNav: NavItem[] = [
-  { href: "/dashboard", label: "Visão geral", icon: LayoutDashboard, exact: true },
+  { href: "/dashboard", label: "Início", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/clientes", label: "Clientes", icon: Users },
+  { href: "/dashboard/triagens", label: "Triagens", icon: ClipboardList },
   { href: "/dashboard/pecas", label: "Peças", icon: FileText },
-  { href: "/dashboard/casos", label: "Casos", icon: Briefcase },
-  { href: "/dashboard/agenda", label: "Agenda", icon: CalendarDays },
-  { href: "/dashboard/relatorios", label: "Relatórios", icon: FileBarChart },
 ];
 
 const roleLabel: Record<Role, string> = {

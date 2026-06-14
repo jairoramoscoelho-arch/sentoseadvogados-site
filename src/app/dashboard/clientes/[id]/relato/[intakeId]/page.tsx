@@ -31,7 +31,7 @@ export default async function RelatoPage({
       <div className="mt-2 flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="font-serif text-2xl font-semibold text-ink sm:text-3xl">
-            Relato &amp; triagem
+            Triagem
           </h1>
           <p className="mt-1 text-muted">{formatDatePtBr(intake.created_at)}</p>
         </div>

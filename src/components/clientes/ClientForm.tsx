@@ -16,12 +16,25 @@ const fieldBase =
 const fieldClass = (e?: boolean) =>
   cn(fieldBase, e ? "border-red-400" : "border-line focus:border-green-700/40");
 
-export function ClientForm() {
+export function ClientForm({
+  onSuccess,
+  embedded,
+}: {
+  onSuccess?: () => void;
+  embedded?: boolean;
+} = {}) {
   const [state, action, pending] = useActionState(createClientAction, initial);
   const ref = useRef<HTMLFormElement>(null);
+  const onSuccessRef = useRef(onSuccess);
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  });
 
   useEffect(() => {
-    if (state.ok) ref.current?.reset();
+    if (state.ok) {
+      ref.current?.reset();
+      onSuccessRef.current?.();
+    }
   }, [state.ok]);
 
   const err = state.errors ?? {};
@@ -31,9 +44,14 @@ export function ClientForm() {
       ref={ref}
       action={action}
       noValidate
-      className="flex h-fit flex-col gap-4 rounded-xl border border-line bg-paper p-5 shadow-soft"
+      className={cn(
+        "flex h-fit flex-col gap-4",
+        !embedded && "rounded-xl border border-line bg-paper p-5 shadow-soft",
+      )}
     >
-      <p className="font-serif text-lg font-semibold text-ink">Novo cliente</p>
+      {!embedded && (
+        <p className="font-serif text-lg font-semibold text-ink">Novo cliente</p>
+      )}
 
       {state.message && (
         <p

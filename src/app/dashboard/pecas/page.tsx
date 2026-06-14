@@ -1,13 +1,8 @@
 import Link from "next/link";
 import { listDrafts } from "@/lib/data/drafts";
-import { listRecentIntakes } from "@/lib/data/clients";
 import { formatDatePtBr, cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
-
-function cap(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
 
 const statusBadge: Record<string, { label: string; cls: string }> = {
   rascunho: { label: "Rascunho", cls: "bg-cloud text-muted" },
@@ -16,10 +11,7 @@ const statusBadge: Record<string, { label: string; cls: string }> = {
 };
 
 export default async function PecasPage() {
-  const [drafts, intakes] = await Promise.all([
-    listDrafts(),
-    listRecentIntakes(),
-  ]);
+  const drafts = await listDrafts();
 
   return (
     <div>
@@ -35,16 +27,13 @@ export default async function PecasPage() {
         </Link>
       </div>
       <p className="mt-2 text-muted">
-        Peças geradas e relatos recentes do escritório.
+        As peças jurídicas geradas pelo escritório.
       </p>
 
-      <h2 className="mt-8 font-serif text-lg font-semibold text-ink">
-        Peças geradas
-      </h2>
-      <div className="mt-3 flex flex-col gap-3">
+      <div className="mt-8 flex flex-col gap-3">
         {drafts.length === 0 && (
           <p className="text-sm text-muted">
-            Nenhuma peça gerada ainda. Gere a partir de um relato.
+            Nenhuma peça gerada ainda. Faça uma triagem e gere a peça.
           </p>
         )}
         {drafts.map((d) => {
@@ -68,40 +57,6 @@ export default async function PecasPage() {
               </div>
               <p className="mt-1 text-xs text-muted">
                 {d.client_name} · atualizada em {formatDatePtBr(d.updated_at)}
-              </p>
-            </Link>
-          );
-        })}
-      </div>
-
-      <h2 className="mt-10 font-serif text-lg font-semibold text-ink">
-        Relatos &amp; triagens recentes
-      </h2>
-      <div className="mt-3 flex flex-col gap-3">
-        {intakes.length === 0 && (
-          <p className="text-sm text-muted">Nenhum relato ainda.</p>
-        )}
-        {intakes.map((i) => {
-          const t = i.triage as {
-            area?: string;
-            tipo_peca_sugerido?: string;
-          } | null;
-          return (
-            <Link
-              key={i.id}
-              href={`/dashboard/clientes/${i.client_id}/relato/${i.id}`}
-              className="rounded-xl border border-line bg-paper p-4 shadow-soft transition-colors hover:border-green-700/20"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <p className="font-medium text-ink">{i.client_name}</p>
-                <p className="shrink-0 text-xs text-muted">
-                  {formatDatePtBr(i.created_at)}
-                </p>
-              </div>
-              <p className="mt-1 text-sm text-ink">
-                {t?.area
-                  ? `${cap(t.area)}${t.tipo_peca_sugerido ? ` · ${t.tipo_peca_sugerido}` : ""}`
-                  : "Triagem pendente"}
               </p>
             </Link>
           );
