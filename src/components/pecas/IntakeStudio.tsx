@@ -230,7 +230,7 @@ export function IntakeStudio({
                 </button>
               </form>
               {mode === "edit" ? (
-                <GenerateDraftButton intakeId={id} />
+                <GenerateDraftButton intakeId={id} area={result.area} />
               ) : (
                 <button
                   type="button"

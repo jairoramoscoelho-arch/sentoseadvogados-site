@@ -135,7 +135,7 @@ export default async function RelatoPage({
         )}
 
       <div className="mt-6">
-        <GenerateDraftButton intakeId={intake.id} />
+        <GenerateDraftButton intakeId={intake.id} area={t?.area} />
       </div>
     </div>
   );
