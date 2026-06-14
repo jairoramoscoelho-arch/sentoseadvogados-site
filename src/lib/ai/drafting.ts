@@ -39,17 +39,22 @@ Formato de SAÍDA (obrigatório):
 - Ao final, inclua um <blockquote> avisando que esta é uma minuta gerada por IA, que pode conter erros (inclusive em citações legais e jurisprudenciais), e que DEVE ser revisada por um advogado antes de qualquer protocolo ou envio.`;
 }
 
-function legalRequisite(triage: TriageResult): string {
-  const tipo = triage.tipo_peca_sugerido.toLowerCase();
-  if (tipo.includes("inicial")) {
-    return triage.area === "trabalhista"
+function legalRequisite(tipo: string, area: TriageResult["area"]): string {
+  const t = tipo.toLowerCase();
+  if (t.includes("inicial") || t.includes("reclama")) {
+    return area === "trabalhista"
       ? "Requisitos da petição/reclamação inicial trabalhista (art. 840 da CLT)."
       : "Requisitos da petição inicial (art. 319 do CPC).";
   }
-  if (tipo.includes("contesta") || tipo.includes("defesa")) {
+  if (t.includes("contesta") || t.includes("defesa")) {
     return "Requisitos da contestação (art. 336 do CPC), com impugnação específica dos fatos.";
   }
-  if (tipo.includes("recurso") || tipo.includes("apela") || tipo.includes("agravo")) {
+  if (
+    t.includes("recurso") ||
+    t.includes("apela") ||
+    t.includes("agravo") ||
+    t.includes("contrarraz")
+  ) {
     return "Observar tempestividade, preparo e a fundamentação das razões recursais.";
   }
   return "";
@@ -60,12 +65,14 @@ export function draftMessages(
   clientName: string,
   rawText: string,
   style?: DraftStyle,
+  tipoOverride?: string,
 ): Array<{ role: "user"; content: string }> {
+  const tipo = tipoOverride?.trim() || triage.tipo_peca_sugerido;
   const teses = triage.teses
     .map((t, i) => `${i + 1}. ${t.titulo} — ${t.fundamento}`)
     .join("\n");
-  const requisito = legalRequisite(triage);
-  const content = `Gere a peça do tipo: ${triage.tipo_peca_sugerido}.
+  const requisito = legalRequisite(tipo, triage.area);
+  const content = `Gere a peça do tipo: ${tipo}.
 
 Cliente: ${clientName} (polo: ${triage.partes.cliente_polo}).
 Contraparte: ${triage.partes.contraparte}.
@@ -89,6 +96,7 @@ export async function streamDraft(
   clientName: string,
   rawText: string,
   style?: DraftStyle,
+  tipoOverride?: string,
 ) {
   const anthropic = await createAnthropicClient();
   return anthropic.messages.stream({
@@ -97,6 +105,6 @@ export async function streamDraft(
     thinking: { type: "adaptive" },
     output_config: { effort: "high" },
     system: buildDraftSystemPrompt(),
-    messages: draftMessages(triage, clientName, rawText, style),
+    messages: draftMessages(triage, clientName, rawText, style, tipoOverride),
   });
 }

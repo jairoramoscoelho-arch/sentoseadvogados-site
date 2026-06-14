@@ -58,4 +58,14 @@ describe("drafting", () => {
     const [msg] = draftMessages(triage, "C", "h", { authors: [], instruction: "" });
     expect(msg.content).not.toContain("ESTILO E DOUTRINA");
   });
+  it("tipoOverride troca o tipo da peça e o requisito legal", () => {
+    const [msg] = draftMessages(triage, "C", "h", undefined, "Recurso");
+    expect(msg.content).toContain("Gere a peça do tipo: Recurso");
+    expect(msg.content.toLowerCase()).toContain("recursais");
+    expect(msg.content).not.toContain("319");
+  });
+  it("sem tipoOverride, usa o tipo sugerido pela triagem", () => {
+    const [msg] = draftMessages(triage, "C", "h");
+    expect(msg.content).toContain("Gere a peça do tipo: Petição inicial");
+  });
 });
