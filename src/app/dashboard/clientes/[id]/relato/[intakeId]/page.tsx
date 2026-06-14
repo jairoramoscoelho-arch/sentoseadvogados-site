@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getClient, getIntake } from "@/lib/data/clients";
 import { formatDatePtBr } from "@/lib/utils";
 import { DeleteIntakeButton } from "@/components/clientes/DeleteIntakeButton";
+import { GenerateDraftButton } from "@/components/pecas/GenerateDraftButton";
 import type { TriageResult } from "@/lib/ai/triage";
 
 export const dynamic = "force-dynamic";
@@ -101,14 +102,7 @@ export default async function RelatoPage({
       )}
 
       <div className="mt-6">
-        <button
-          type="button"
-          disabled
-          title="Em breve (Sprint 1B)"
-          className="inline-flex h-11 cursor-not-allowed items-center rounded-full border border-line px-6 text-sm font-medium text-muted opacity-70"
-        >
-          Gerar peça (em breve)
-        </button>
+        <GenerateDraftButton intakeId={intake.id} />
       </div>
     </div>
   );

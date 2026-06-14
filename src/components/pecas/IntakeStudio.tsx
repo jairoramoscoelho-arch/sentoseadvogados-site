@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { GenerateDraftButton } from "./GenerateDraftButton";
 import {
   runTriage,
   saveIntake,
@@ -211,14 +212,18 @@ export function IntakeStudio({
                       : "Salvar relato + triagem"}
                 </button>
               </form>
-              <button
-                type="button"
-                disabled
-                title="Em breve (Sprint 1B)"
-                className="inline-flex h-11 cursor-not-allowed items-center rounded-full border border-line px-6 text-sm font-medium text-muted opacity-70"
-              >
-                Gerar peça (em breve)
-              </button>
+              {mode === "edit" ? (
+                <GenerateDraftButton intakeId={id} />
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  title="Salve o relato para gerar a peça"
+                  className="inline-flex h-11 cursor-not-allowed items-center rounded-full border border-line px-6 text-sm font-medium text-muted opacity-70"
+                >
+                  Gerar peça
+                </button>
+              )}
             </div>
           </>
         )}
