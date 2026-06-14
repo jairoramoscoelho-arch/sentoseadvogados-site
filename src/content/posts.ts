@@ -15,7 +15,7 @@ export const posts = [
     date: "2025-12-02",
     authors: ["Victor Mata", "João Felipe Fagundes"],
     category: "Direito Trabalhista",
-    cover: "/blog/compliance.png",
+    cover: "/blog/compliance.webp",
     seo: {
       title: "Compliance Trabalhista: por que sua empresa precisa",
       description:
@@ -44,7 +44,7 @@ export const posts = [
     date: "2025-12-02",
     authors: ["Sento-Sé Advogados"],
     category: "Institucional",
-    cover: "/blog/equipe.jpg",
+    cover: "/blog/equipe.webp",
     seo: {
       title: "A jornada de excelência do escritório Sento-Sé",
       description:

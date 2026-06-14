@@ -53,7 +53,7 @@ export default function QuemSomosPage() {
             <div className="overflow-hidden rounded-2xl shadow-card ring-1 ring-green-900/10">
               <div className="relative aspect-[5/4]">
                 <Image
-                  src="/img/equipe.jpg"
+                  src="/img/equipe.webp"
                   alt="Equipe do escritório Sento-Sé Advogados"
                   fill
                   sizes="(max-width: 1024px) 100vw, 45vw"

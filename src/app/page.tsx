@@ -38,7 +38,7 @@ export default function Home() {
         <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
           <Parallax speed={0.12} className="absolute -top-[12%] left-0 h-[124%] w-full">
             <Image
-              src="/img/equipe.jpg"
+              src="/img/equipe.webp"
               alt=""
               fill
               priority
@@ -170,7 +170,7 @@ export default function Home() {
             <div className="overflow-hidden rounded-2xl shadow-card ring-1 ring-green-900/10">
               <div className="relative aspect-[5/4]">
                 <Image
-                  src="/img/equipe-grupo.png"
+                  src="/img/equipe-grupo.webp"
                   alt="Advogados e advogadas do escritório Sento-Sé"
                   fill
                   sizes="(max-width: 1024px) 100vw, 45vw"
