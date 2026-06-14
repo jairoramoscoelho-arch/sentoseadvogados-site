@@ -1,14 +1,14 @@
-# Estúdio de Peças — Parte B.1: Estilo (autores renomados + texto livre) Implementation Plan
+# Estúdio de Peças — Parte B.1: Estilo (autor renomado **ou** texto livre) Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Na tela que precede a geração da peça, o advogado escolhe autores renomados da área (cuja voz **e doutrina** inspiram a peça) e/ou escreve instruções livres; essa escolha é gravada na peça e injetada no prompt de geração.
+**Goal:** Na tela que precede a geração da peça, o advogado escolhe **um único** autor renomado da área (voz + doutrina inspiram a peça), apresentado num **modal com accordion por área**, **OU** escreve instruções livres — nunca os dois ao mesmo tempo. A escolha é gravada na peça e injetada no prompt de geração.
 
-**Architecture:** A seleção de estilo é capturada por um `<form>` já existente (o de "Gerar peça"), persistida em duas novas colunas de `legal_drafts` (`style_authors text[]`, `style_instruction text`), e lida pela rota de geração, que a passa para `streamDraft`. O prompt do redator ganha uma seção "ESTILO E DOUTRINA" no conteúdo do usuário (o system prompt não muda). Autores ficam numa config estática por área (`src/lib/pecas/autores.ts`) — juristas brasileiros conhecidos, sem upload (o upload de peças próprias é a Sprint 6).
+**Architecture:** Um componente client (`EstiloPeca`) controla o estado com **exclusão mútua**: escolher um autor desabilita/limpa o campo livre, e ter texto livre desabilita o botão de escolher autor. Os autores aparecem num `<dialog>` nativo com accordion por área (single-select). A escolha vira inputs ocultos de um `<form>` (o de "Gerar peça"), é persistida em `legal_drafts` (`style_authors text[]` com 0 ou 1 item, `style_instruction text`), lida pela rota de geração e passada a `streamDraft`. O prompt do redator ganha uma seção "ESTILO E DOUTRINA" no conteúdo do usuário (o system prompt não muda).
 
-**Tech Stack:** Next.js 16 (App Router, Server Actions, Route Handlers), React 19, Supabase (Postgres + RLS), Anthropic SDK (`messages.stream`, Opus 4.8), Zod, Vitest, Tailwind v4.
+**Tech Stack:** Next.js 16 (App Router, Server Actions, Route Handlers), React 19 (useState, useFormStatus), Supabase (Postgres + RLS), Anthropic SDK (`messages.stream`, Opus 4.8), Zod, Vitest, Tailwind v4 (`<dialog>` nativo centralizado, `has-[:checked]`/accordion).
 
-**Decisão do cliente (13/06):** "Estilo + doutrina" — a IA emula a voz do autor E pode invocar suas teses/posições doutrinárias como reforço, sem inventar fatos do caso (revisão do advogado obrigatória, como já avisa o `<blockquote>` da minuta).
+**Decisão do cliente:** "Estilo + doutrina" — a IA emula a voz do autor E pode invocar suas teses/posições doutrinárias como reforço, sem inventar fatos do caso. Addendum obrigatório: **modal + accordion**, **um único autor**, **exclusão mútua autor ⇄ texto livre**.
 
 ---
 
@@ -17,15 +17,16 @@
 | Arquivo | Responsabilidade | Ação |
 |---|---|---|
 | `supabase/migrations/0007_draft_style.sql` | Colunas de estilo em `legal_drafts` | Criar |
-| `src/types/db.ts` | Tipo `LegalDraft` ganha `style_authors`/`style_instruction` | Modificar |
+| `src/types/db.ts` | `LegalDraft` ganha `style_authors`/`style_instruction` | Modificar |
 | `src/lib/data/drafts.ts` | `DRAFT_COLS` inclui as colunas novas | Modificar |
-| `src/lib/ai/triage.ts` | Exportar `TriageArea` (tipo da área) | Modificar |
-| `src/lib/pecas/autores.ts` | Config estática de autores por área + `autoresPorArea()` | Criar |
-| `src/lib/pecas/autores.test.ts` | Testa a resolução de autores por área | Criar |
-| `src/lib/ai/drafting.ts` | `DraftStyle` + `styleSection()` + 4º parâmetro `style` em `draftMessages`/`streamDraft` | Modificar |
+| `src/lib/ai/triage.ts` | Exportar `TriageArea` | Modificar |
+| `src/lib/pecas/autores.ts` | Autores por área + `autoresPorArea()` + `AREA_LABEL` + `areasComAutores()` | Criar |
+| `src/lib/pecas/autores.test.ts` | Testa resolução por área e o agrupamento do modal | Criar |
+| `src/lib/ai/drafting.ts` | `DraftStyle` + `styleSection()` + 4º parâmetro `style` | Modificar |
 | `src/lib/ai/drafting.test.ts` | Testa a injeção do estilo no prompt | Modificar |
-| `src/app/dashboard/pecas/actions.ts` | `createDraftFromIntake` captura e grava o estilo | Modificar |
-| `src/components/pecas/GenerateDraftButton.tsx` | Campos de estilo (checkboxes + texto livre) no form de gerar | Modificar |
+| `src/app/dashboard/pecas/actions.ts` | `createDraftFromIntake` captura/grava estilo (exclusão mútua no servidor) | Modificar |
+| `src/components/pecas/EstiloPeca.tsx` | Picker: modal+accordion (1 autor) ⇄ texto livre | Criar |
+| `src/components/pecas/GenerateDraftButton.tsx` | Form de gerar compõe `EstiloPeca` | Modificar |
 | `src/app/dashboard/clientes/[id]/relato/[intakeId]/page.tsx` | Passa `area` ao botão | Modificar |
 | `src/components/pecas/IntakeStudio.tsx` | Passa `area` ao botão (modo edição) | Modificar |
 | `src/app/api/drafts/[id]/generate/route.ts` | Lê o estilo da peça e passa a `streamDraft` | Modificar |
@@ -36,8 +37,8 @@
 
 **Files:**
 - Create: `supabase/migrations/0007_draft_style.sql`
-- Modify: `src/types/db.ts:51-66` (interface `LegalDraft`)
-- Modify: `src/lib/data/drafts.ts:5-6` (`DRAFT_COLS`)
+- Modify: `src/types/db.ts` (interface `LegalDraft`, após `style_id`)
+- Modify: `src/lib/data/drafts.ts` (`DRAFT_COLS`)
 
 - [ ] **Step 1: Escrever a migração**
 
@@ -45,7 +46,7 @@ Create `supabase/migrations/0007_draft_style.sql`:
 
 ```sql
 -- =====================================================================
--- Sprint 1D — estilo da peça: autores renomados (voz + doutrina) e/ou
+-- Sprint 1D — estilo da peça: UM autor renomado (voz + doutrina) OU
 -- instruções livres do advogado, capturados antes da geração.
 -- =====================================================================
 alter table public.legal_drafts
@@ -76,7 +77,7 @@ const DRAFT_COLS =
   "id, client_id, case_id, intake_id, template_id, title, status, content_html, model_used, style_id, style_authors, style_instruction, created_by, assigned_to, created_at, updated_at, deleted_at";
 ```
 
-- [ ] **Step 5: Verificar tipos e lint**
+- [ ] **Step 5: Verificar lint**
 
 Run: `npm run lint`
 Expected: sem erros (exit 0).
@@ -90,16 +91,16 @@ git commit -m "feat(pecas): colunas style_authors/style_instruction em legal_dra
 
 ---
 
-## Task 2: Config de autores por área
+## Task 2: Config de autores por área (+ agrupamento p/ o modal)
 
 **Files:**
-- Modify: `src/lib/ai/triage.ts:6` (exportar `TriageArea`)
+- Modify: `src/lib/ai/triage.ts` (exportar `TriageArea`)
 - Create: `src/lib/pecas/autores.ts`
 - Test: `src/lib/pecas/autores.test.ts`
 
 - [ ] **Step 1: Exportar o tipo da área**
 
-In `src/lib/ai/triage.ts`, logo após a linha que define `TRIAGE_AREAS` (`export const TRIAGE_AREAS = [...] as const;`), adicionar:
+In `src/lib/ai/triage.ts`, logo após a linha `export const TRIAGE_AREAS = [...] as const;`, adicionar:
 
 ```ts
 export type TriageArea = (typeof TRIAGE_AREAS)[number];
@@ -111,7 +112,7 @@ Create `src/lib/pecas/autores.test.ts`:
 
 ```ts
 import { describe, it, expect } from "vitest";
-import { autoresPorArea } from "./autores";
+import { autoresPorArea, areasComAutores, AREA_LABEL } from "./autores";
 
 describe("autoresPorArea", () => {
   it("trabalhista inclui juristas conhecidos da área", () => {
@@ -135,6 +136,21 @@ describe("autoresPorArea", () => {
         expect(a.nome.length).toBeGreaterThan(0);
         expect(a.descricao.length).toBeGreaterThan(0);
       }
+    }
+  });
+});
+
+describe("areasComAutores (grupos do modal)", () => {
+  it("exclui áreas sem autores (ex.: 'outro')", () => {
+    const areas = areasComAutores().map((g) => g.area);
+    expect(areas).toContain("trabalhista");
+    expect(areas).not.toContain("outro");
+  });
+
+  it("cada grupo traz label e autores não vazios", () => {
+    for (const g of areasComAutores()) {
+      expect(g.label).toBe(AREA_LABEL[g.area]);
+      expect(g.autores.length).toBeGreaterThan(0);
     }
   });
 });
@@ -185,21 +201,40 @@ const AUTORES_POR_AREA: Record<TriageArea, Autor[]> = {
   outro: [],
 };
 
+export const AREA_LABEL: Record<TriageArea, string> = {
+  trabalhista: "Trabalhista",
+  civel: "Cível",
+  consumidor: "Consumidor",
+  medico: "Médico / Saúde",
+  outro: "Outras áreas",
+};
+
 export function autoresPorArea(area: TriageArea): Autor[] {
   return AUTORES_POR_AREA[area] ?? [];
+}
+
+/** Grupos (área → autores) para o accordion do modal; ignora áreas sem autores. */
+export function areasComAutores(): Array<{
+  area: TriageArea;
+  label: string;
+  autores: Autor[];
+}> {
+  return (Object.keys(AUTORES_POR_AREA) as TriageArea[])
+    .filter((a) => AUTORES_POR_AREA[a].length > 0)
+    .map((a) => ({ area: a, label: AREA_LABEL[a], autores: AUTORES_POR_AREA[a] }));
 }
 ```
 
 - [ ] **Step 5: Rodar o teste e ver passar**
 
 Run: `npx vitest run src/lib/pecas/autores.test.ts`
-Expected: PASS (4 testes).
+Expected: PASS (6 testes).
 
 - [ ] **Step 6: Commit**
 
 ```bash
 git add src/lib/ai/triage.ts src/lib/pecas/autores.ts src/lib/pecas/autores.test.ts
-git commit -m "feat(pecas): config de autores por área + TriageArea"
+git commit -m "feat(pecas): autores por área + grupos para o modal accordion"
 ```
 
 ---
@@ -207,12 +242,12 @@ git commit -m "feat(pecas): config de autores por área + TriageArea"
 ## Task 3: Injeção do estilo no prompt de geração
 
 **Files:**
-- Modify: `src/lib/ai/drafting.ts:38-80` (`draftMessages`, `streamDraft`)
+- Modify: `src/lib/ai/drafting.ts` (`draftMessages`, `streamDraft`)
 - Test: `src/lib/ai/drafting.test.ts`
 
 - [ ] **Step 1: Escrever os testes (que falham)**
 
-In `src/lib/ai/drafting.test.ts`, substituir o import da primeira linha e o objeto `triage`, e acrescentar testes de estilo. O arquivo inteiro passa a ser:
+Substituir o conteúdo inteiro de `src/lib/ai/drafting.test.ts` por:
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -254,14 +289,13 @@ describe("drafting", () => {
     const [msg] = draftMessages(triage, "C", "h");
     expect(msg.content).not.toContain("ESTILO E DOUTRINA");
   });
-  it("com autores, injeta os nomes e a seção de estilo", () => {
+  it("com autor, injeta o nome e a seção de estilo", () => {
     const [msg] = draftMessages(triage, "C", "h", {
-      authors: ["Fredie Didier Jr.", "Nelson Nery Junior"],
+      authors: ["Fredie Didier Jr."],
       instruction: null,
     });
     expect(msg.content).toContain("ESTILO E DOUTRINA");
     expect(msg.content).toContain("Fredie Didier Jr.");
-    expect(msg.content).toContain("Nelson Nery Junior");
     expect(msg.content.toLowerCase()).toContain("doutrina");
   });
   it("com instrução livre, injeta o texto do advogado", () => {
@@ -272,7 +306,7 @@ describe("drafting", () => {
     expect(msg.content).toContain("ESTILO E DOUTRINA");
     expect(msg.content).toContain("tom assertivo, ênfase na dignidade");
   });
-  it("estilo vazio (sem autores e sem instrução) não cria a seção", () => {
+  it("estilo vazio (sem autor e sem instrução) não cria a seção", () => {
     const [msg] = draftMessages(triage, "C", "h", { authors: [], instruction: "" });
     expect(msg.content).not.toContain("ESTILO E DOUTRINA");
   });
@@ -288,7 +322,7 @@ Expected: FAIL — `draftMessages` ainda não aceita o 4º argumento / não há 
 
 In `src/lib/ai/drafting.ts`:
 
-(a) Logo após o import de topo (`import type { TriageResult } from "./triage";`), adicionar o tipo e o helper:
+(a) Logo após o import de topo (`import type { TriageResult } from "./triage";`), adicionar:
 
 ```ts
 export interface DraftStyle {
@@ -301,7 +335,7 @@ function styleSection(style: DraftStyle | undefined): string {
   const parts: string[] = [];
   if (style.authors.length > 0) {
     parts.push(
-      `Inspire-se na VOZ e na DOUTRINA destes autores — emule o estilo (tom, estrutura, retórica) e, quando pertinente, invoque as teses/posições doutrinárias deles como reforço argumentativo, SEM inventar fatos do caso nem citações que você não tenha certeza: ${style.authors.join("; ")}.`,
+      `Inspire-se na VOZ e na DOUTRINA de ${style.authors.join("; ")} — emule o estilo (tom, estrutura, retórica) e, quando pertinente, invoque as teses/posições doutrinárias desse autor como reforço argumentativo, SEM inventar fatos do caso nem citações de que você não tenha certeza.`,
     );
   }
   const instr = style.instruction?.trim();
@@ -312,7 +346,7 @@ function styleSection(style: DraftStyle | undefined): string {
 }
 ```
 
-(b) Trocar a assinatura e o `return` de `draftMessages` para receber e anexar o estilo:
+(b) Trocar a assinatura e o `return` de `draftMessages`:
 
 ```ts
 export function draftMessages(
@@ -375,7 +409,7 @@ Expected: PASS (7 testes).
 
 ```bash
 git add src/lib/ai/drafting.ts src/lib/ai/drafting.test.ts
-git commit -m "feat(pecas): estilo (autores + texto livre) injetado no prompt do redator"
+git commit -m "feat(pecas): estilo (autor ou texto livre) injetado no prompt do redator"
 ```
 
 ---
@@ -383,11 +417,11 @@ git commit -m "feat(pecas): estilo (autores + texto livre) injetado no prompt do
 ## Task 4: `createDraftFromIntake` captura e grava o estilo
 
 **Files:**
-- Modify: `src/app/dashboard/pecas/actions.ts:13-44`
+- Modify: `src/app/dashboard/pecas/actions.ts` (`createSchema`, `createDraftFromIntake`)
 
 - [ ] **Step 1: Ampliar o schema de criação**
 
-In `src/app/dashboard/pecas/actions.ts`, substituir a linha `const createSchema = z.object({ intakeId: z.string().uuid() });` por:
+In `src/app/dashboard/pecas/actions.ts`, substituir `const createSchema = z.object({ intakeId: z.string().uuid() });` por:
 
 ```ts
 const createSchema = z.object({
@@ -399,7 +433,7 @@ const createSchema = z.object({
 
 - [ ] **Step 2: Ler os campos do FormData**
 
-In `createDraftFromIntake`, substituir a linha do `safeParse`:
+In `createDraftFromIntake`, substituir:
 
 ```ts
   const parsed = createSchema.safeParse({ intakeId: formData.get("intakeId") });
@@ -415,16 +449,19 @@ por:
   });
 ```
 
-- [ ] **Step 3: Gravar o estilo na peça**
+- [ ] **Step 3: Gravar o estilo na peça (exclusão mútua no servidor)**
 
-In `createDraftFromIntake`, no objeto passado a `.insert({ ... })`, logo após a linha `intake_id: intake.id,`, adicionar:
+In `createDraftFromIntake`, no objeto de `.insert({ ... })`, logo após `intake_id: intake.id,`, adicionar:
 
 ```ts
       style_authors: parsed.data.styleAuthors,
-      style_instruction: parsed.data.styleInstruction ?? null,
+      style_instruction:
+        parsed.data.styleAuthors.length > 0
+          ? null
+          : parsed.data.styleInstruction ?? null,
 ```
 
-- [ ] **Step 4: Verificar tipos e lint**
+- [ ] **Step 4: Verificar lint**
 
 Run: `npm run lint`
 Expected: sem erros (exit 0).
@@ -433,17 +470,228 @@ Expected: sem erros (exit 0).
 
 ```bash
 git add src/app/dashboard/pecas/actions.ts
-git commit -m "feat(pecas): grava o estilo escolhido na criação da peça"
+git commit -m "feat(pecas): grava o estilo (autor ou texto) na criação da peça"
 ```
 
 ---
 
-## Task 5: Campos de estilo no botão "Gerar peça"
+## Task 5: Componente `EstiloPeca` — modal accordion (1 autor) ⇄ texto livre
+
+**Files:**
+- Create: `src/components/pecas/EstiloPeca.tsx`
+
+- [ ] **Step 1: Criar o componente**
+
+Create `src/components/pecas/EstiloPeca.tsx`:
+
+```tsx
+"use client";
+
+import { useRef, useState } from "react";
+import { ChevronDown, X, BookOpen } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { areasComAutores } from "@/lib/pecas/autores";
+import type { TriageArea } from "@/lib/ai/triage";
+
+const groups = areasComAutores();
+
+/**
+ * Escolha de estilo da peça (opcional), com EXCLUSÃO MÚTUA:
+ * — OU um único autor de referência (voz + doutrina), escolhido num modal
+ *   com accordion por área;
+ * — OU instruções livres no campo de texto.
+ * Nunca os dois ao mesmo tempo. Emite inputs ocultos lidos por createDraftFromIntake.
+ */
+export function EstiloPeca({ area }: { area?: TriageArea }) {
+  const [author, setAuthor] = useState<string | null>(null);
+  const [instruction, setInstruction] = useState("");
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const [openArea, setOpenArea] = useState<TriageArea | null>(
+    area && groups.some((g) => g.area === area) ? area : groups[0]?.area ?? null,
+  );
+
+  const hasText = instruction.trim().length > 0;
+  const openModal = () => dialogRef.current?.showModal();
+  const closeModal = () => dialogRef.current?.close();
+
+  const pick = (nome: string) => {
+    setAuthor(nome);
+    setInstruction("");
+    closeModal();
+  };
+
+  return (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="font-serif text-lg font-semibold text-ink">
+        Estilo da peça{" "}
+        <span className="text-sm font-normal text-muted">(opcional)</span>
+      </legend>
+      <p className="text-sm text-muted">
+        Escolha <strong>um</strong> autor de referência (a IA segue a voz e pode
+        citar a doutrina dele — revise as citações) <em>ou</em> escreva instruções
+        livres. Apenas uma das opções.
+      </p>
+
+      {/* O que o form envia quando há autor escolhido. */}
+      {author && <input type="hidden" name="styleAuthors" value={author} />}
+
+      {/* Opção A — autor */}
+      <div>
+        {author ? (
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-green-700/40 bg-green-50/60 px-4 py-3">
+            <span className="inline-flex items-center gap-2 text-sm">
+              <BookOpen className="h-4 w-4 text-green-700" aria-hidden="true" />
+              <span className="font-medium text-ink">{author}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setAuthor(null)}
+              className="inline-flex h-8 items-center gap-1 rounded-full px-3 text-xs font-medium text-muted transition-colors hover:bg-cloud hover:text-ink"
+            >
+              <X className="h-3.5 w-3.5" aria-hidden="true" />
+              Remover
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={openModal}
+            disabled={hasText}
+            className="inline-flex h-11 items-center gap-2 rounded-full border border-line px-5 text-sm font-medium text-green-700 transition-colors hover:bg-cloud disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <BookOpen className="h-4 w-4" aria-hidden="true" />
+            Escolher autor de referência
+          </button>
+        )}
+        {hasText && !author && (
+          <p className="mt-1.5 text-xs text-muted">
+            Apague as instruções livres para escolher um autor.
+          </p>
+        )}
+      </div>
+
+      {/* divisor */}
+      <div className="flex items-center gap-3 text-xs uppercase tracking-wide text-muted/70">
+        <span className="h-px flex-1 bg-line" />
+        ou
+        <span className="h-px flex-1 bg-line" />
+      </div>
+
+      {/* Opção B — texto livre */}
+      <div>
+        <textarea
+          name="styleInstruction"
+          rows={3}
+          maxLength={2000}
+          value={instruction}
+          onChange={(e) => setInstruction(e.target.value)}
+          disabled={author !== null}
+          placeholder="Ex.: tom assertivo, ênfase na dignidade da pessoa humana, explorar a tese da perda de uma chance…"
+          className="w-full resize-y rounded-lg border border-line bg-paper px-4 py-3 text-sm text-ink shadow-soft transition-colors placeholder:text-muted/70 focus:border-green-700/40 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:bg-cloud/50 disabled:opacity-60"
+        />
+        {author && (
+          <p className="mt-1.5 text-xs text-muted">
+            Remova o autor para escrever instruções livres.
+          </p>
+        )}
+      </div>
+
+      {/* Modal com accordion por área (single-select) */}
+      <dialog
+        ref={dialogRef}
+        onClick={(e) => {
+          if (e.target === dialogRef.current) closeModal();
+        }}
+        className={cn(
+          "w-full max-w-none bg-paper p-0 text-ink shadow-lift backdrop:bg-green-900/40",
+          "fixed inset-x-0 bottom-0 top-auto m-0 max-h-[85dvh] overflow-auto rounded-t-2xl",
+          "sm:inset-0 sm:m-auto sm:h-fit sm:max-h-[85dvh] sm:w-[min(560px,92vw)] sm:rounded-2xl",
+        )}
+      >
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-paper px-5 py-4">
+          <p className="font-serif text-lg font-semibold text-ink">
+            Autor de referência
+          </p>
+          <button
+            type="button"
+            onClick={closeModal}
+            aria-label="Fechar"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-muted transition-colors hover:bg-cloud hover:text-ink"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+        <div className="flex flex-col gap-2 p-4">
+          {groups.map((g) => {
+            const isOpen = openArea === g.area;
+            return (
+              <div
+                key={g.area}
+                className="overflow-hidden rounded-xl border border-line"
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenArea(isOpen ? null : g.area)}
+                  aria-expanded={isOpen}
+                  className="flex w-full items-center justify-between gap-3 bg-cloud/40 px-4 py-3 text-left text-sm font-medium text-ink transition-colors hover:bg-cloud"
+                >
+                  {g.label}
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 shrink-0 text-muted transition-transform duration-200 [transition-timing-function:var(--ease-out-expo)]",
+                      isOpen && "rotate-180",
+                    )}
+                    aria-hidden="true"
+                  />
+                </button>
+                {isOpen && (
+                  <ul className="flex flex-col divide-y divide-line">
+                    {g.autores.map((a) => (
+                      <li key={a.nome}>
+                        <button
+                          type="button"
+                          onClick={() => pick(a.nome)}
+                          className="flex w-full flex-col gap-0.5 px-4 py-3 text-left transition-colors hover:bg-green-50/60"
+                        >
+                          <span className="text-sm font-medium text-ink">
+                            {a.nome}
+                          </span>
+                          <span className="text-xs text-muted">{a.descricao}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </dialog>
+    </fieldset>
+  );
+}
+```
+
+- [ ] **Step 2: Verificar lint**
+
+Run: `npm run lint`
+Expected: sem erros (exit 0).
+
+- [ ] **Step 3: Commit**
+
+```bash
+git add src/components/pecas/EstiloPeca.tsx
+git commit -m "feat(pecas): EstiloPeca — modal accordion de 1 autor com exclusão mútua"
+```
+
+---
+
+## Task 6: `GenerateDraftButton` compõe `EstiloPeca`
 
 **Files:**
 - Modify: `src/components/pecas/GenerateDraftButton.tsx` (arquivo inteiro)
 
-- [ ] **Step 1: Reescrever o componente com os campos de estilo**
+- [ ] **Step 1: Reescrever o botão para usar o picker**
 
 Replace o conteúdo inteiro de `src/components/pecas/GenerateDraftButton.tsx` por:
 
@@ -453,7 +701,7 @@ Replace o conteúdo inteiro de `src/components/pecas/GenerateDraftButton.tsx` po
 import { useFormStatus } from "react-dom";
 import { Loader2 } from "lucide-react";
 import { createDraftFromIntake } from "@/app/dashboard/pecas/actions";
-import { autoresPorArea } from "@/lib/pecas/autores";
+import { EstiloPeca } from "./EstiloPeca";
 import type { TriageArea } from "@/lib/ai/triage";
 
 function Submit() {
@@ -470,11 +718,7 @@ function Submit() {
   );
 }
 
-/**
- * Cria a peça a partir do relato (intake) e leva ao editor para gerar.
- * Quando a área é conhecida, oferece autores renomados (voz + doutrina) e um
- * campo livre que influenciam o estilo da peça — opcional.
- */
+/** Cria a peça a partir do relato (intake), com estilo opcional, e leva ao editor. */
 export function GenerateDraftButton({
   intakeId,
   area,
@@ -482,59 +726,13 @@ export function GenerateDraftButton({
   intakeId: string;
   area?: TriageArea;
 }) {
-  const autores = area ? autoresPorArea(area) : [];
-  const temEstilo = area !== undefined;
-
   return (
     <form
       action={createDraftFromIntake}
       className="flex flex-col gap-4 rounded-xl border border-line bg-paper p-5 shadow-soft"
     >
       <input type="hidden" name="intakeId" value={intakeId} />
-
-      {temEstilo && (
-        <fieldset className="flex flex-col gap-3">
-          <legend className="font-serif text-lg font-semibold text-ink">
-            Estilo da peça <span className="text-sm font-normal text-muted">(opcional)</span>
-          </legend>
-          <p className="text-sm text-muted">
-            Marque autores cuja voz e doutrina devem inspirar a peça e/ou escreva
-            instruções livres. A IA segue o estilo e pode citar a doutrina deles —
-            revise as citações antes de usar.
-          </p>
-
-          {autores.length > 0 && (
-            <div className="grid gap-2 sm:grid-cols-2">
-              {autores.map((a) => (
-                <label
-                  key={a.nome}
-                  className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-line p-3 text-sm transition-colors hover:border-green-700/30 has-[:checked]:border-green-700/50 has-[:checked]:bg-green-50/60"
-                >
-                  <input
-                    type="checkbox"
-                    name="styleAuthors"
-                    value={a.nome}
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-green-700"
-                  />
-                  <span>
-                    <span className="font-medium text-ink">{a.nome}</span>
-                    <span className="block text-xs text-muted">{a.descricao}</span>
-                  </span>
-                </label>
-              ))}
-            </div>
-          )}
-
-          <textarea
-            name="styleInstruction"
-            rows={3}
-            maxLength={2000}
-            placeholder="Ex.: tom assertivo, ênfase na dignidade da pessoa humana, explorar a tese da perda de uma chance…"
-            className="w-full resize-y rounded-lg border border-line bg-paper px-4 py-3 text-sm text-ink shadow-soft transition-colors placeholder:text-muted/70 focus:border-green-700/40 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:ring-offset-1"
-          />
-        </fieldset>
-      )}
-
+      <EstiloPeca area={area} />
       <Submit />
     </form>
   );
@@ -544,26 +742,26 @@ export function GenerateDraftButton({
 - [ ] **Step 2: Verificar lint**
 
 Run: `npm run lint`
-Expected: sem erros (exit 0). (O componente ainda é usado com a antiga assinatura em dois lugares — `area` é opcional, então compila; a Task 6 passa a área.)
+Expected: sem erros (exit 0). (`area` é opcional; os usos atuais sem `area` continuam compilando até a Task 7.)
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add src/components/pecas/GenerateDraftButton.tsx
-git commit -m "feat(pecas): campos de estilo (autores + texto livre) no Gerar peça"
+git commit -m "feat(pecas): Gerar peça compõe o picker de estilo EstiloPeca"
 ```
 
 ---
 
-## Task 6: Passar a área ao botão (relato e estúdio)
+## Task 7: Passar a área ao botão (relato e estúdio)
 
 **Files:**
-- Modify: `src/app/dashboard/clientes/[id]/relato/[intakeId]/page.tsx:137-139`
-- Modify: `src/components/pecas/IntakeStudio.tsx:233`
+- Modify: `src/app/dashboard/clientes/[id]/relato/[intakeId]/page.tsx` (bloco do `GenerateDraftButton`)
+- Modify: `src/components/pecas/IntakeStudio.tsx` (uso do `GenerateDraftButton` no modo edição)
 
 - [ ] **Step 1: Relato — passar `t?.area`**
 
-In `src/app/dashboard/clientes/[id]/relato/[intakeId]/page.tsx`, substituir o bloco:
+In `src/app/dashboard/clientes/[id]/relato/[intakeId]/page.tsx`, substituir:
 
 ```tsx
       <div className="mt-6">
@@ -579,8 +777,6 @@ por:
       </div>
 ```
 
-(`t` é `TriageResult | null`; se não houver triagem, `area` fica `undefined` e o bloco de estilo some — comportamento desejado.)
-
 - [ ] **Step 2: Estúdio (modo edição) — passar `result.area`**
 
 In `src/components/pecas/IntakeStudio.tsx`, no ramo `mode === "edit"`, substituir:
@@ -595,33 +791,28 @@ por:
                 <GenerateDraftButton intakeId={id} area={result.area} />
 ```
 
-(Dentro do bloco `{result && (...)}`, `result` é `TriageResult` não-nulo, logo `result.area` é seguro.)
-
 - [ ] **Step 3: Verificar lint e build**
 
-Run: `npm run lint`
-Expected: sem erros.
-
-Run: `npm run build`
-Expected: build conclui; rota `/dashboard/clientes/[id]/relato/[intakeId]` presente.
+Run: `npm run lint && npm run build`
+Expected: sem erros; build conclui; rota `/dashboard/clientes/[id]/relato/[intakeId]` presente.
 
 - [ ] **Step 4: Commit**
 
 ```bash
 git add "src/app/dashboard/clientes/[id]/relato/[intakeId]/page.tsx" src/components/pecas/IntakeStudio.tsx
-git commit -m "feat(pecas): área da triagem alimenta os autores sugeridos"
+git commit -m "feat(pecas): área da triagem abre o accordion na área certa"
 ```
 
 ---
 
-## Task 7: Rota de geração consome o estilo da peça
+## Task 8: Rota de geração consome o estilo da peça
 
 **Files:**
-- Modify: `src/app/api/drafts/[id]/generate/route.ts:30-44`
+- Modify: `src/app/api/drafts/[id]/generate/route.ts` (bloco do `streamDraft`)
 
 - [ ] **Step 1: Montar o `DraftStyle` e passar a `streamDraft`**
 
-In `src/app/api/drafts/[id]/generate/route.ts`, substituir o bloco:
+In `src/app/api/drafts/[id]/generate/route.ts`, substituir:
 
 ```ts
   const client = await getClient(draft.client_id);
@@ -657,7 +848,7 @@ por:
   } catch (e) {
 ```
 
-- [ ] **Step 2: Verificar tipos, lint e build**
+- [ ] **Step 2: Verificar lint e build**
 
 Run: `npm run lint && npm run build`
 Expected: sem erros; build conclui.
@@ -666,66 +857,69 @@ Expected: sem erros; build conclui.
 
 ```bash
 git add "src/app/api/drafts/[id]/generate/route.ts"
-git commit -m "feat(pecas): geração usa o estilo (autores + instrução) gravado na peça"
+git commit -m "feat(pecas): geração usa o estilo (autor/instrução) gravado na peça"
 ```
 
 ---
 
-## Task 8: Verificação end-to-end + merge
+## Task 9: Verificação end-to-end + merge
 
 **Files:** nenhum (verificação).
 
 - [ ] **Step 1: Suíte completa**
 
 Run: `npx vitest run`
-Expected: todos verdes (13 anteriores + 4 de autores + 4 novos de drafting = ~21 testes).
+Expected: todos verdes (13 anteriores + 6 de autores + 4 novos de drafting = ~23 testes).
 
 Run: `npm run lint && npm run build`
 Expected: 0 erros; build conclui.
 
 - [ ] **Step 2: Teste manual (contra a API real)**
 
-1. Em `/dashboard/triagens` → "Nova triagem": cadastre/escolha um cliente, escreva um relato trabalhista, rode a triagem e salve.
-2. Abra a triagem (`/dashboard/clientes/[id]/relato/[intakeId]`). Confirme que aparece o bloco **"Estilo da peça (opcional)"** com autores trabalhistas (Maurício Godinho Delgado etc.).
-3. Marque 1–2 autores, escreva uma instrução livre, clique **"Gerar peça"**.
-4. No editor, confirme que a peça é gerada (streaming) e que o tom/estrutura reflete o estilo pedido.
-5. No Supabase (ou via uma leitura), confirme que a linha de `legal_drafts` tem `style_authors` e `style_instruction` preenchidos.
-6. Repita sem marcar nada → a geração continua funcionando (caminho sem estilo).
+1. Em `/dashboard/triagens` → "Nova triagem": escolha um cliente, escreva um relato trabalhista, rode a triagem e salve.
+2. Abra a triagem (`/dashboard/clientes/[id]/relato/[intakeId]`). Confirme o bloco **"Estilo da peça (opcional)"**.
+3. Clique **"Escolher autor de referência"** → abre o **modal**; confirme o **accordion por área** com a área da triagem (Trabalhista) já aberta. Escolha **um** autor → o modal fecha, aparece o chip do autor e a **textarea fica desabilitada**.
+4. Clique **"Remover"** no chip → a textarea reabilita. Digite um texto → o botão **"Escolher autor" fica desabilitado** (exclusão mútua nos dois sentidos).
+5. Com um autor escolhido (ou texto), clique **"Gerar peça"**. No editor, confirme a geração e que o tom reflete a escolha.
+6. Confirme no banco que `legal_drafts` tem `style_authors` **ou** `style_instruction` (nunca os dois).
+7. Repita sem escolher nada → a geração continua funcionando.
 
 - [ ] **Step 3: Merge para produção**
 
 ```bash
 git checkout main
-git merge --no-ff feat/dashboard-advogados -m "Merge: estilo de peças (autores + texto livre)"
+git merge --no-ff feat/dashboard-advogados -m "Merge: estilo de peças (autor renomado ou texto livre)"
 git push origin main
 git checkout feat/dashboard-advogados
 ```
 
-(Guard de segredos antes do commit/push: `git diff --cached --name-only | grep -i env` deve ser vazio.)
+(Guard de segredos: `git diff --cached --name-only | grep -i env` deve ser vazio.)
 
 ---
 
 ## Self-Review
 
-**Spec coverage (item #4 do batch do usuário):**
-- "autores renomados daquela área para marcar com check" → Task 2 (config) + Task 5 (checkboxes) + Task 6 (área correta). ✓
-- "ou um box de texto livre que influencia a peça" → Task 5 (`textarea name="styleInstruction"`) + Task 4 (captura) + Task 3 (injeção). ✓
-- "Estilo + doutrina" (decisão do cliente) → `styleSection` instrui emular voz E invocar doutrina, sem inventar fatos. ✓
-- Persistência para re-geração → colunas em `legal_drafts` (Task 1), lidas pela rota (Task 7). ✓
+**Spec coverage (item #4 + addendum):**
+- "autores renomados da área para marcar" → Task 2 (config/grupos) + Task 5 (modal accordion) + Task 7 (área certa aberta). ✓
+- "modal accordeon" → `<dialog>` nativo + accordion por área (`areasComAutores`) na Task 5. ✓
+- "só pode escolher um" → `author: string | null` single-select; `pick()` substitui; `style_authors` com 0/1 item. ✓
+- "se escolher autor não pode escrever no box e vice-versa" → textarea `disabled={author !== null}` (não submete) + botão `disabled={hasText}`; servidor zera `style_instruction` quando há autor (Task 4 Step 3). ✓
+- "texto livre influencia a peça" → `name="styleInstruction"` → captura (Task 4) → injeção (Task 3). ✓
+- "estilo + doutrina" → `styleSection` instrui emular voz E invocar doutrina, sem inventar fatos. ✓
+- Persistência p/ re-geração → colunas (Task 1) lidas pela rota (Task 8). ✓
 
-**Placeholder scan:** sem "TBD"/"TODO"/"handle edge cases" genéricos — cada passo traz o código completo. ✓
+**Placeholder scan:** sem "TBD"/"TODO"/genéricos — cada passo traz o código completo. ✓
 
 **Type consistency:**
-- `DraftStyle { authors: string[]; instruction: string | null }` — definido na Task 3, montado igual na rota (Task 7) a partir de `draft.style_authors`/`draft.style_instruction` (colunas da Task 1, tipadas na Task 1 Step 3). ✓
-- `autoresPorArea(area: TriageArea): Autor[]` — assinatura idêntica entre Task 2 (def), teste e Task 5 (uso). ✓
-- `GenerateDraftButton({ intakeId, area })` — `area?: TriageArea` opcional; usos na Task 6 passam `t?.area` / `result.area` (ambos `TriageArea | undefined`). ✓
-- `createDraftFromIntake` lê `styleAuthors` via `getAll` (array) e `styleInstruction` via `get` — casam com `name="styleAuthors"` (checkbox múltiplo) e `name="styleInstruction"` (textarea) da Task 5. ✓
+- `DraftStyle { authors: string[]; instruction: string | null }` — Task 3 (def) e Task 8 (montagem a partir de `draft.style_authors`/`draft.style_instruction`, colunas/typo da Task 1). ✓
+- `areasComAutores(): { area: TriageArea; label: string; autores: Autor[] }[]` — Task 2 (def/teste) e Task 5 (uso `groups`). ✓
+- `AREA_LABEL: Record<TriageArea,string>` — Task 2; usado em `areasComAutores`. ✓
+- `EstiloPeca({ area?: TriageArea })` — Task 5 (def) e Task 6 (uso); `GenerateDraftButton({ intakeId, area? })` — Task 6 (def) e Task 7 (`t?.area` / `result.area`). ✓
+- Form ⇄ action: `name="styleAuthors"` (oculto, 0/1) ↔ `getAll("styleAuthors")`; `name="styleInstruction"` (textarea) ↔ `get("styleInstruction")`. ✓
 
 ---
 
 ## Próximos planos (restante da Parte B)
 
-Esta é a Parte **B.1**. Os outros dois subsistemas da Parte B viram planos próprios (cada um entrega software testável sozinho):
-
-- **B.2 — Galeria de tipos + wizard de criação dinâmica** (`/dashboard/pecas/nova` reformulado): config `src/lib/pecas/tipos.ts`, fluxo tipo → cliente → contexto (reusar triagem existente / nova história) → estilo (reusa o componente desta B.1) → gerar. Generaliza `createDraftFromIntake` para uma action `createDraft` que aceita `intakeId` **ou** história nova.
-- **B.3 — Geração a partir de documento (Claude-PDF nativo)**: bucket Storage `peca-anexos` (RLS como `case-documents`), action de upload, `streamDraft`/`draftMessages` ganham `documents?` (document content block, PDF base64), e a rota envia o anexo ao Claude. Habilita Recurso/Contestação a partir do PDF da decisão/inicial. Sem docling.
+- **B.2 — Galeria de tipos + wizard** (`/dashboard/pecas/nova` reformulado): tipo → cliente → contexto (reusar triagem / nova história) → estilo (reusa `EstiloPeca`) → gerar; generaliza `createDraftFromIntake`.
+- **B.3 — Geração a partir de documento (Claude-PDF nativo)**: bucket `peca-anexos`, upload, `documents?` em `draftMessages`/`streamDraft`, rota envia o PDF ao Claude. Habilita Recurso/Contestação a partir do PDF. Sem docling.
