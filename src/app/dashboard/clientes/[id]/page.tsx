@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClient, listIntakesByClient } from "@/lib/data/clients";
-import { formatDatePtBr } from "@/lib/utils";
+import { IntakeList } from "@/components/clientes/IntakeList";
 
 export const dynamic = "force-dynamic";
 
@@ -15,11 +15,13 @@ export default async function ClientDetailPage({
   if (!client) notFound();
   const intakes = await listIntakesByClient(id);
 
+  const contato = [client.email, client.phone].filter(Boolean).join(" · ");
+
   return (
     <div>
       <Link
         href="/dashboard/clientes"
-        className="text-sm text-muted hover:text-ink"
+        className="text-sm text-muted transition-colors hover:text-ink"
       >
         ← Clientes
       </Link>
@@ -29,12 +31,13 @@ export default async function ClientDetailPage({
       <p className="mt-1 text-muted">
         {client.type === "pf" ? "Pessoa física" : "Pessoa jurídica"}
         {client.document ? ` · ${client.document}` : ""}
+        {contato ? ` · ${contato}` : ""}
       </p>
 
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
           href={`/dashboard/pecas/nova?cliente=${client.id}`}
-          className="inline-flex h-11 items-center rounded-full bg-green-700 px-6 text-sm font-medium text-white hover:bg-green-800"
+          className="inline-flex h-11 items-center rounded-full bg-green-700 px-6 text-sm font-medium text-white transition-colors hover:bg-green-800"
         >
           Nova peça / triagem
         </Link>
@@ -43,32 +46,8 @@ export default async function ClientDetailPage({
       <h2 className="mt-10 font-serif text-xl font-semibold text-ink">
         Relatos &amp; triagens
       </h2>
-      <div className="mt-4 flex flex-col gap-3">
-        {intakes.length === 0 && (
-          <p className="text-sm text-muted">Nenhum relato registrado ainda.</p>
-        )}
-        {intakes.map((i) => {
-          const t = i.triage as {
-            area?: string;
-            tipo_peca_sugerido?: string;
-          } | null;
-          return (
-            <div
-              key={i.id}
-              className="rounded-xl border border-line bg-paper p-4 shadow-soft"
-            >
-              <p className="text-xs text-muted">{formatDatePtBr(i.created_at)}</p>
-              <p className="mt-1 text-sm text-ink">
-                {t?.area
-                  ? `Área: ${t.area} · ${t.tipo_peca_sugerido ?? ""}`
-                  : "Triagem pendente"}
-              </p>
-              {i.raw_text && (
-                <p className="mt-1 line-clamp-2 text-sm text-muted">{i.raw_text}</p>
-              )}
-            </div>
-          );
-        })}
+      <div className="mt-4">
+        <IntakeList intakes={intakes} clientId={id} />
       </div>
     </div>
   );

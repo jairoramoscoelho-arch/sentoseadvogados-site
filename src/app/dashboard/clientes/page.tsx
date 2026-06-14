@@ -1,6 +1,6 @@
 import { listClients } from "@/lib/data/clients";
 import { ClientForm } from "@/components/clientes/ClientForm";
-import { ClientsTable } from "@/components/clientes/ClientsTable";
+import { ClientsBrowser } from "@/components/clientes/ClientsBrowser";
 
 export const dynamic = "force-dynamic";
 
@@ -12,11 +12,11 @@ export default async function ClientesPage() {
         Clientes
       </h1>
       <p className="mt-2 text-muted">
-        Cadastre e consulte os clientes do escritório.
+        Cadastre, busque e consulte os clientes do escritório.
       </p>
       <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,360px)_1fr]">
         <ClientForm />
-        <ClientsTable clients={clients} />
+        <ClientsBrowser clients={clients} />
       </div>
     </div>
   );

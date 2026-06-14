@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { requireSession } from "@/lib/auth/dal";
+import { redirect } from "next/navigation";
+import { requireRole, requireSession } from "@/lib/auth/dal";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export interface ClientActionState {
@@ -57,4 +58,35 @@ export async function createClientAction(
 
   revalidatePath("/dashboard/clientes");
   return { ok: true, message: "Cliente cadastrado." };
+}
+
+export interface DeleteIntakeState {
+  error?: string;
+}
+
+const deleteSchema = z.object({
+  intakeId: z.string().uuid(),
+  clientId: z.string().uuid(),
+});
+
+export async function deleteIntake(
+  _prev: DeleteIntakeState,
+  formData: FormData,
+): Promise<DeleteIntakeState> {
+  await requireRole(["socio", "advogado"]);
+  const parsed = deleteSchema.safeParse({
+    intakeId: formData.get("intakeId"),
+    clientId: formData.get("clientId"),
+  });
+  if (!parsed.success) return { error: "Requisição inválida." };
+
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase
+    .from("intakes")
+    .delete()
+    .eq("id", parsed.data.intakeId);
+  if (error) return { error: "Não foi possível excluir o relato." };
+
+  revalidatePath(`/dashboard/clientes/${parsed.data.clientId}`);
+  redirect(`/dashboard/clientes/${parsed.data.clientId}`);
 }
