@@ -41,7 +41,9 @@ export function DashboardFab() {
         />
       )}
 
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
+      {/* pointer-events-none no container: só o botão e as ações abertas captam
+          cliques — assim a área (invisível) das ações não bloqueia o conteúdo. */}
+      <div className="pointer-events-none fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
         <ul className="flex flex-col items-end gap-3" aria-hidden={!open}>
           {actions.map((action, i) => {
             const Icon = action.icon;
@@ -52,7 +54,7 @@ export function DashboardFab() {
                 className={cn(
                   "flex items-center gap-3 transition-[opacity,transform] duration-300 [transition-timing-function:var(--ease-out-expo)]",
                   open
-                    ? "translate-y-0 opacity-100"
+                    ? "pointer-events-auto translate-y-0 opacity-100"
                     : "pointer-events-none translate-y-2 opacity-0",
                 )}
               >
@@ -78,7 +80,7 @@ export function DashboardFab() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-label={open ? "Fechar ações rápidas" : "Ações rápidas"}
-          className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-green-700 text-white shadow-lift transition-colors duration-300 [transition-timing-function:var(--ease-out-expo)] hover:bg-green-800 motion-safe:active:scale-95"
+          className="pointer-events-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-green-700 text-white shadow-lift transition-colors duration-300 [transition-timing-function:var(--ease-out-expo)] hover:bg-green-800 motion-safe:active:scale-95"
         >
           <Plus
             className={cn(
