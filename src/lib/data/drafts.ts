@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { LegalDraft, DraftStatus } from "@/types/db";
 
 const DRAFT_COLS =
-  "id, client_id, case_id, intake_id, template_id, title, status, content_html, model_used, style_id, created_by, assigned_to, created_at, updated_at, deleted_at";
+  "id, client_id, case_id, intake_id, template_id, title, status, content_html, model_used, style_id, style_authors, style_instruction, created_by, assigned_to, created_at, updated_at, deleted_at";
 
 export async function getDraft(id: string): Promise<LegalDraft | null> {
   const supabase = await createSupabaseServerClient();
