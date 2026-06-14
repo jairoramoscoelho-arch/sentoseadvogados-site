@@ -179,6 +179,23 @@ export function IntakeStudio({
               {result.observacoes && (
                 <Item label="Observações" value={result.observacoes} />
               )}
+              {Array.isArray(result.documentos_necessarios) &&
+                result.documentos_necessarios.length > 0 && (
+                  <div>
+                    <dt className="font-medium text-ink">Documentos a coletar</dt>
+                    <ul className="mt-1 flex flex-col gap-1.5 text-muted">
+                      {result.documentos_necessarios.map((d, i) => (
+                        <li key={i}>
+                          <span className="text-ink">
+                            {d.essencial ? "★ " : "• "}
+                            {d.documento}
+                          </span>{" "}
+                          — {d.motivo}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
             </dl>
 
             {saveState.message && !saveState.ok && (

@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { Plus, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { ClientForm } from "./ClientForm";
 
 /** Cadastro de cliente em modal nativo (discreto), fora da lista. */
@@ -26,15 +27,21 @@ export function NewClientModal() {
         onClick={(e) => {
           if (e.target === dialogRef.current) close();
         }}
-        className="w-[min(480px,92vw)] rounded-2xl bg-paper p-0 text-ink shadow-lift backdrop:bg-green-900/40"
+        className={cn(
+          "w-full max-w-none bg-paper p-0 text-ink shadow-lift backdrop:bg-green-900/40",
+          // Mobile: bottom sheet (largura total, ancorado embaixo, rola).
+          "fixed inset-x-0 bottom-0 top-auto m-0 max-h-[90dvh] overflow-auto rounded-t-2xl",
+          // Desktop: card centralizado (inset-0 + m-auto = centro real).
+          "sm:inset-0 sm:m-auto sm:h-fit sm:w-[min(480px,92vw)] sm:rounded-2xl",
+        )}
       >
-        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+        <div className="sticky top-0 flex items-center justify-between border-b border-line bg-paper px-5 py-4">
           <p className="font-serif text-lg font-semibold text-ink">Novo cliente</p>
           <button
             type="button"
             onClick={close}
             aria-label="Fechar"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-cloud hover:text-ink"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-muted transition-colors hover:bg-cloud hover:text-ink"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>

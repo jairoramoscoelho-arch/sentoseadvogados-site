@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getClient, getIntake } from "@/lib/data/clients";
-import { formatDatePtBr } from "@/lib/utils";
+import { formatDatePtBr, cn } from "@/lib/utils";
 import { DeleteIntakeButton } from "@/components/clientes/DeleteIntakeButton";
 import { GenerateDraftButton } from "@/components/pecas/GenerateDraftButton";
 import type { TriageResult } from "@/lib/ai/triage";
@@ -100,6 +100,39 @@ export default async function RelatoPage({
           Triagem não disponível para este relato.
         </p>
       )}
+
+      {t &&
+        Array.isArray(t.documentos_necessarios) &&
+        t.documentos_necessarios.length > 0 && (
+          <section className="mt-6 rounded-xl border border-line bg-paper p-5 shadow-soft">
+            <h2 className="font-serif text-lg font-semibold text-ink">
+              Documentos a coletar
+            </h2>
+            <p className="mt-1 text-sm text-muted">
+              Peça ao cliente para instruir e comprovar o caso.
+            </p>
+            <ul className="mt-3 flex flex-col gap-2 text-sm">
+              {t.documentos_necessarios.map((d, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span
+                    className={cn(
+                      "mt-0.5 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium",
+                      d.essencial
+                        ? "bg-gold-100 text-gold-700"
+                        : "bg-cloud text-muted",
+                    )}
+                  >
+                    {d.essencial ? "essencial" : "útil"}
+                  </span>
+                  <span>
+                    <span className="font-medium text-ink">{d.documento}</span> —{" "}
+                    <span className="text-muted">{d.motivo}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
       <div className="mt-6">
         <GenerateDraftButton intakeId={intake.id} />

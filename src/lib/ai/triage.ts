@@ -22,6 +22,15 @@ export const TriageSchema = z.object({
   ),
   tipo_peca_sugerido: z.string(),
   jurisprudence_queries: z.array(z.string()),
+  documentos_necessarios: z
+    .array(
+      z.object({
+        documento: z.string(),
+        motivo: z.string(),
+        essencial: z.boolean(),
+      }),
+    )
+    .default([]),
   observacoes: z.string(),
 });
 
@@ -37,6 +46,7 @@ A partir do relato do cliente (em linguagem leiga), classifique o caso de forma 
 - teses: as teses jurídicas cabíveis, cada uma com fundamento legal resumido (artigos/súmulas), do mais forte ao mais fraco.
 - tipo_peca_sugerido: a peça inicial mais adequada (ex.: "Petição inicial", "Contestação", "Recurso", "Notificação extrajudicial").
 - jurisprudence_queries: 3 a 6 termos de busca úteis para localizar jurisprudência favorável.
+- documentos_necessarios: documentos que o advogado deve coletar do cliente para instruir e comprovar o caso. Para cada um, informe "documento", "motivo" (o que ele prova) e "essencial" (true/false). Ex.: trabalhista → folhas de ponto, contrato de trabalho, holerites, CTPS; consumidor/fraude bancária → extratos, comprovantes, prints da conversa com o banco/empresa, boletim de ocorrência.
 - observacoes: ressalvas, dados faltantes ou alertas (prazos, prescrição). Pode ser vazio.
 
 Baseie-se no relato; não invente fatos. Esta é uma triagem inicial — não substitui a análise do advogado.`;
