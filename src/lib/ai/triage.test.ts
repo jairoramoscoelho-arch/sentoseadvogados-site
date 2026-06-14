@@ -20,7 +20,8 @@ describe("TriageSchema", () => {
     expect(() => TriageSchema.parse({ ...valid, area: "tributario" })).toThrow();
   });
   it("rejeita quando falta um campo obrigatório", () => {
-    const { resumo, ...incompleto } = valid;
+    const incompleto: Record<string, unknown> = { ...valid };
+    delete incompleto.resumo;
     expect(() => TriageSchema.parse(incompleto)).toThrow();
   });
 });
