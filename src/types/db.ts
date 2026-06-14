@@ -61,6 +61,7 @@ export interface LegalDraft {
   style_id: string | null;
   style_authors: string[];
   style_instruction: string | null;
+  tipo: string | null;
   created_by: string | null;
   assigned_to: string | null;
   created_at: string;
