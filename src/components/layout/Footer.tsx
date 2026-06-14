@@ -74,6 +74,14 @@ export function Footer() {
                 Perguntas frequentes
               </Link>
             </li>
+            <li>
+              <Link
+                href="/login"
+                className="text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline"
+              >
+                Área restrita
+              </Link>
+            </li>
           </ul>
         </nav>
 
