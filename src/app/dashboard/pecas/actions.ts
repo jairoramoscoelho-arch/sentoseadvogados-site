@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/auth/dal";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getClient, getIntake } from "@/lib/data/clients";
-import { listVersionNumbers } from "@/lib/data/drafts";
+import { getDraft, listVersionNumbers } from "@/lib/data/drafts";
 import { computeNextVersionNo } from "@/lib/data/version";
 import { TriageSchema } from "@/lib/ai/triage";
 import { STUDIO_MODEL } from "@/lib/ai/anthropic";
@@ -31,6 +31,7 @@ export async function createDraftFromIntake(formData: FormData): Promise<void> {
     .insert({
       client_id: intake.client_id,
       case_id: intake.case_id,
+      intake_id: intake.id,
       title,
       status: "rascunho",
       model_used: STUDIO_MODEL,
@@ -90,6 +91,13 @@ export async function saveDraft(
   });
 
   revalidatePath(`/dashboard/pecas/${parsed.data.draftId}`);
+
+  // Salvar manual (não a gravação automática pós-geração) → volta à ficha do cliente.
+  if (parsed.data.origin !== "geracao") {
+    const draft = await getDraft(parsed.data.draftId);
+    if (draft) redirect(`/dashboard/clientes/${draft.client_id}`);
+  }
+
   if (vErr) {
     // Corrida benigna no version_no (unique) — o conteúdo já foi salvo.
     return { ok: true, message: "Peça salva (recarregue para o histórico)." };

@@ -1,5 +1,6 @@
 import "server-only";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { consumedIntakeIds } from "./drafts";
 import type { Client, Intake } from "@/types/db";
 
 const CLIENT_COLS =
@@ -36,6 +37,15 @@ export async function listIntakesByClient(clientId: string): Promise<Intake[]> {
     .eq("client_id", clientId)
     .order("created_at", { ascending: false });
   return (data ?? []) as Intake[];
+}
+
+/** Triagens do cliente que ainda não viraram peça (para a ficha do cliente). */
+export async function listOpenIntakesByClient(clientId: string): Promise<Intake[]> {
+  const [intakes, consumed] = await Promise.all([
+    listIntakesByClient(clientId),
+    consumedIntakeIds(),
+  ]);
+  return intakes.filter((i) => !consumed.has(i.id));
 }
 
 export async function getIntake(id: string): Promise<Intake | null> {
@@ -87,4 +97,13 @@ export async function listRecentIntakes(limit = 50): Promise<RecentIntake[]> {
       created_at: r.created_at,
     };
   });
+}
+
+/** Triagens recentes que ainda não viraram peça (para a aba Triagens). */
+export async function listOpenIntakes(limit = 100): Promise<RecentIntake[]> {
+  const [recent, consumed] = await Promise.all([
+    listRecentIntakes(limit * 2),
+    consumedIntakeIds(),
+  ]);
+  return recent.filter((i) => !consumed.has(i.id)).slice(0, limit);
 }
