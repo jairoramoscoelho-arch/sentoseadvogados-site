@@ -14,6 +14,7 @@ const createSchema = z.object({
   intakeId: z.string().uuid(),
   styleAuthors: z.array(z.string()).default([]),
   styleInstruction: z.string().max(2000).optional(),
+  tipo: z.string().max(120).optional(),
 });
 
 export async function createDraftFromIntake(formData: FormData): Promise<void> {
@@ -22,6 +23,7 @@ export async function createDraftFromIntake(formData: FormData): Promise<void> {
     intakeId: formData.get("intakeId"),
     styleAuthors: formData.getAll("styleAuthors").map((v) => String(v)),
     styleInstruction: (formData.get("styleInstruction") as string) || undefined,
+    tipo: (formData.get("tipo") as string) || undefined,
   });
   if (!parsed.success) redirect("/dashboard/pecas");
 
@@ -30,7 +32,9 @@ export async function createDraftFromIntake(formData: FormData): Promise<void> {
 
   const triage = TriageSchema.safeParse(intake.triage);
   const client = await getClient(intake.client_id);
-  const tipo = triage.success ? triage.data.tipo_peca_sugerido : "Peça jurídica";
+  const tipo =
+    parsed.data.tipo?.trim() ||
+    (triage.success ? triage.data.tipo_peca_sugerido : "Peça jurídica");
   const title = `${tipo}${client ? ` — ${client.name}` : ""}`;
 
   const supabase = await createSupabaseServerClient();
@@ -40,6 +44,7 @@ export async function createDraftFromIntake(formData: FormData): Promise<void> {
       client_id: intake.client_id,
       case_id: intake.case_id,
       intake_id: intake.id,
+      tipo: parsed.data.tipo?.trim() || null,
       style_authors: parsed.data.styleAuthors,
       style_instruction:
         parsed.data.styleAuthors.length > 0
